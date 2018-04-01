@@ -1,0 +1,36 @@
+{
+  "name": "proyecto-integrador",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "dotenv": "^5.0.1",
+    "ejs": "~2.5.8",
+    "express": "~4.16.3",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
+    "mysql": "^2.15.0",
+    "serve-favicon": "^2.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  },
+  "description": "Nothing yet",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PacoDw/Nissan-School-Project"
+  },
+  "author": "Paco Preciado Mendoza <__pm@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PacoDw/Nissan-School-Project/issues"
+  },
+  "homepage": "https://github.com/PacoDw/Nissan-School-Project#readme"
+}
