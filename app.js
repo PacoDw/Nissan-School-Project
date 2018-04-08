@@ -17,7 +17,7 @@ const teamRouter  = require('./routes/team');
 // view engine setup---------------------------------------
 app
     .set('views', `${__dirname}/views`)
-    .set('view engine', 'ejs');
+    .set('view engine', 'hbs');
 
 
 // Middlewares----------------------------------------------
@@ -53,6 +53,27 @@ app
       res.status(err.status || 500);
       res.render('error');
     });
-    
-  
+
+// Handlebars default config-------------------------------
+const hbs = require('hbs');
+const fs = require('fs');
+
+const partialsDir = __dirname + '/views';
+
+const filenames = fs.readdirSync(partialsDir);
+
+filenames.forEach(function (filename) {
+  const matches = /^([^.]+).hbs$/.exec(filename);
+  if (!matches) {
+    return;
+  }
+  const name = matches[1];
+  const template = fs.readFileSync(partialsDir + '/' + filename, 'utf8');
+  hbs.registerPartial(name, template);
+});
+
+hbs.registerHelper('json', function(context) {
+    return JSON.stringify(context, null, 2);
+});
+
 module.exports = app;

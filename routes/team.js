@@ -5,13 +5,15 @@ var router = express.Router();
 router
       .get('/', function(req, res, next) {
         
-        res.render('team', team = [
-          {name: 'Aylin' },
-          {name: 'Calleros'},
-          {name: 'Alan'},
-          {name: 'Conchita'},
-          {name: 'Paco'}
-          ]);
+        res.render('team', {
+          team: [
+            {name: 'Aylin' },
+            {name: 'Calleros'},
+            {name: 'Alan'},
+            {name: 'Conchita'},
+            {name: 'Paco'}
+          ]
+        })
       });
 
 module.exports = router;
