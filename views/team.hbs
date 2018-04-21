@@ -1,4 +1,8 @@
-    <h1>Team</h1>
+{{> header }}
+
+<div class="container">
+    <br><br>
+    <h3>Team</h3>    
     <ul>
         {{#each team}}
             <li> {{this.name}} </li>
@@ -6,3 +10,6 @@
     </ul>
     <br>
     <a href="/">Back</a>
+</div>
+
+{{> footer-end }}
