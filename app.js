@@ -13,9 +13,10 @@ const app = express();
 // Authentication packages----------------------------------------------------------
 const bcrypt       = require('bcrypt');
 const session      = require('express-session');
+const passport     = require('passport');
 
 // Routes imports-------------------------------------------------------------------
-const indexRouter  = require('./routes/index');
+const index        = require('./routes/index');
 const register     = require('./routes/register');
 const login        = require('./routes/login');
 const teamRouter   = require('./routes/team');
@@ -27,6 +28,7 @@ app
     .set('view engine', 'hbs');
 
 
+
 // Middlewares----------------------------------------------------------------------
 app
     .use(logger('dev'))
@@ -35,20 +37,22 @@ app
     .use(cookieParser())
     .use('/assets', express.static(`${__dirname}/public`)) //Setting folder public like assets to the client side
 
-    .use(session({
-      secret: 'iovjcxzoivjewqn',
-      resave: false,
-      saveUninitialized: false  // Initiating the session without you have logged 
-    }))
-    
+    // Initiating the session without you have logged if is in true
+    .use(session({ secret: 'iovjcxzoivjewqn', resave: false, saveUninitialized: false }))
+    .use(passport.initialize())
+    .use(passport.session());
+
 
 //----------------------------------------------------------------------------------
 // Handling Routes------------------------------------------------------------------
 app
-    .use('/', indexRouter)
+    .use('/', index)
     .use('/register', register)
     .use('/login', login)
     .use('/team', teamRouter);
+
+
+
 
 //-----------------------------------------------------------------------------------
 // catch 404 and forward to error handler--------------------------------------------
