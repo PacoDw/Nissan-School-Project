@@ -1,6 +1,8 @@
-const express = require('express');
-const bcrypt  = require('bcrypt'); 
-const router  = express.Router();
+const express  = require('express');
+const bcrypt   = require('bcrypt');
+const passport = require('passport'); 
+
+const router   = express.Router();
 
 // Register routes
 router
@@ -18,15 +20,38 @@ router
                 if(err) throw err;
 
                  // Inserting a new user withing the database
-                db.users.query("SELECT newUser(?, ?, ?) as msg", 
+                db.users.query("CALL newUser(?, ?, ?)", 
                 [req.body.username, req.body.email, hash], (err, results, fields) => {
                     if(err) throw err;
 
-                    
-                    console.log(results[0].msg);
-                    res.redirect('/');
+                    // console.log(results[0][0]);
+                    const user = {
+                        id    : results[0][0].id_user,
+                        name  : results[0][0].username,
+                        email : results[0][0].email  
+                    }
+                    // console.log(user);
+
+                    req.login(user, (err) => {
+                        if(err) throw err;
+
+                        res.redirect('/');
+                    });                    
                 }); 
             });
-        })
+        });
+
+
+passport.serializeUser(function(user, done) {
+    // console.log("SERIALIZE+++++++++++++++")
+    // console.log(user);
+    done(null, user);
+    });
+    
+passport.deserializeUser(function(user, done) {
+    // console.log("DESERIALIZE+++++++++++++++")
+    // console.log(user);
+    done(null, user);
+});
 
 module.exports = router;
