@@ -7,20 +7,22 @@ const bodyParser   = require('body-parser');
 // Set the enviroment variables-----------------------------------------------------
 require('dotenv').config();
 
-
 const app = express();
 
 // Authentication packages----------------------------------------------------------
 const bcrypt       = require('bcrypt');
 const session      = require('express-session');
 const passport     = require('passport');
+const MySQLStore   = require('express-mysql-session')(session);
+
 
 // Routes imports-------------------------------------------------------------------
 const index        = require('./routes/index');
 const register     = require('./routes/register');
 const login        = require('./routes/login');
+const logout       = require('./routes/logout'); 
 const teamRouter   = require('./routes/team');
-
+const seller       = require('./routes/seller');
 
 // view engine setup----------------------------------------------------------------
 app
@@ -38,7 +40,7 @@ app
     .use('/assets', express.static(`${__dirname}/public`)) //Setting folder public like assets to the client side
 
     // Initiating the session without you have logged if is in true
-    .use(session({ secret: 'iovjcxzoivjewqn', resave: false, saveUninitialized: false }))
+    .use(session({ secret: 'iovjcxzoivjewqn', store: new MySQLStore({},require('./db/my_database').users), resave: false, saveUninitialized: false }))
     .use(passport.initialize())
     .use(passport.session());
 
@@ -49,9 +51,9 @@ app
     .use('/', index)
     .use('/register', register)
     .use('/login', login)
-    .use('/team', teamRouter);
-
-
+    .use('/logout', logout)
+    .use('/team', teamRouter)
+    .use('/seller', seller);
 
 
 //-----------------------------------------------------------------------------------
