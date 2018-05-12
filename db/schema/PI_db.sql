@@ -350,19 +350,6 @@ CREATE TABLE users (
     PRIMARY KEY (id_user)
 );
 
-DROP TABLE IF EXISTS sessions;
-CREATE TABLE sessions (
-    session_id VARCHAR(128) NOT NULL,
-    expires     INT(11) UNSIGNED NOT NULL,
-    data        TEXT,
-	id_user		INTEGER,
-    
-    PRIMARY KEY (session_id, id_user),
-    
-    FOREIGN KEY (id_user)
-    REFERENCES users (id_user)
-);
-
 INSERT INTO users (username, email, password) VALUES ('root', 'root@root.com', 'root');
 
 -- SELECT * FROM users;
