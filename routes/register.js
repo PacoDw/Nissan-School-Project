@@ -4,10 +4,10 @@ const passport = require('passport');
 
 const router   = express.Router();
 
-// Register routes
+// Register Router--------------------------------------------------------------------------------
 router
         .get('/', (req, res) => {
-            res.render('register');
+            res.render('register',{ auth : req.isAuthenticated()});
         })
 
         .post('/', (req, res) => {
@@ -35,7 +35,7 @@ router
                     req.login(user, (err) => {
                         if(err) throw err;
 
-                        res.redirect('/');
+                        res.redirect('/seller');
                     });                    
                 }); 
             });
