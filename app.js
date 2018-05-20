@@ -3,6 +3,7 @@ const createError  = require('http-errors');
 const cookieParser = require('cookie-parser');
 const logger       = require('morgan');
 const bodyParser   = require('body-parser');
+const flash        = require('connect-flash');
 
 // Set the enviroment variables-----------------------------------------------------
 require('dotenv').config();
@@ -10,10 +11,11 @@ require('dotenv').config();
 const app = express();
 
 // Authentication packages----------------------------------------------------------
-const bcrypt       = require('bcrypt');
-const session      = require('express-session');
-const passport     = require('passport');
-const MySQLStore   = require('express-mysql-session')(session);
+const bcrypt        = require('bcrypt');
+const session       = require('express-session');
+const passport      = require('passport');
+const MySQLStore    = require('express-mysql-session')(session);
+const LocalStrategy = require('passport-local').Strategy;
 
 
 // Routes imports-------------------------------------------------------------------
@@ -30,7 +32,7 @@ app
     .set('view engine', 'hbs');
 
 
-
+//----------------------------------------------------------------------------------
 // Middlewares----------------------------------------------------------------------
 app
     .use(logger('dev'))
@@ -42,18 +44,76 @@ app
     // Initiating the session without you have logged if is in true
     .use(session({ secret: 'iovjcxzoivjewqn', store: new MySQLStore({},require('./db/my_database').users), resave: false, saveUninitialized: false }))
     .use(passport.initialize())
-    .use(passport.session());
+    .use(passport.session())
+    .use(flash());
+
+
+
+// Midleware that setting true if the user is athenticated before that passing to routes
+app.use( (req, res, next) => { res.locals.isAuthenticated = req.isAuthenticated(); next(); } );
 
 
 //----------------------------------------------------------------------------------
 // Handling Routes------------------------------------------------------------------
 app
-    .use('/', index)
+    .use('/',         index)
     .use('/register', register)
-    .use('/login', login)
-    .use('/logout', logout)
-    .use('/team', teamRouter)
-    .use('/seller', seller);
+    .use('/login',    login)
+    .use('/logout',   logout)
+    .use('/team',     teamRouter)
+    .use('/seller',   seller);
+
+
+
+//----------------------------------------------------------------------------------
+// Passport local strategy
+passport.use(new LocalStrategy(
+    (username, password, done) => {
+        
+        // Conection to the database
+        const db = require('./db/my_database');
+
+        db.users.query('SELECT id_user, username, email, password FROM users WHERE username = ?', 
+        [username], (err, results, fields) => {
+            if ( err ) {
+                console.log('Ocurrio un error');
+                return done(err);                
+            }
+
+            if( results.length === 0 )
+            {
+                // console.log('No existe el usuario en la base de datos');
+                return done(null, false, { message: 'Incorrect username or password.' });
+            }
+            else
+            {    
+                bcrypt.compare(password, results[0].password, 
+                    (err, response) => {
+                        if (err) throw err;
+                            
+                        if ( response )
+                        {    
+                            const user = {
+                                id    : results[0].id_user,
+                                name  : results[0].username,
+                                email : results[0].email  
+                            }
+                
+                            return done(null, user);
+                        }
+                        else
+                        {
+                            // console.log('The password or user is incorrect');
+                            return done(null, false, { message: 'Incorrect username or password.'} );
+                            return done(null, false);
+                        }
+                    }
+                );
+            }
+        })
+    }
+));
+
 
 
 //-----------------------------------------------------------------------------------
@@ -73,6 +133,8 @@ app
       res.status(err.status || 500);
       res.render('error');
     });
+
+
 
 // Handlebars default config---------------------------------------------------------
 const hbs = require('hbs');
