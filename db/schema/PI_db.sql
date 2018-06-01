@@ -4,6 +4,19 @@ CREATE DATABASE IF NOT EXISTS nissan_db;
 
 USE nissan_db;
 
+-- USERS ----------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+	id_user		INTEGER AUTO_INCREMENT NOT NULL,
+    username 	VARCHAR(15)  UNIQUE NOT NULL,
+    email		VARCHAR(100) UNIQUE NOT NULL,
+    password	VARCHAR(60)  NOT NULL,
+    typeUser    VARCHAR(60)  NOT NULL
+
+    PRIMARY KEY (id_user)
+);
+
+INSERT INTO users (username, email, password) VALUES ('root', 'root@root.com', 'root');
 -- GLOBAL MANAGERS-------------------------------------------------------------------------------------------
 CREATE TABLE globals_managers (
     id_global_manager   INTEGER AUTO_INCREMENT NOT NULL,
@@ -15,8 +28,13 @@ CREATE TABLE globals_managers (
     state               VARCHAR(35) NOT NULL,
     postal_code         VARCHAR(10) NOT NULL,
     country             VARCHAR(45) NOT NULL,
+    job                 VARCHAR(45) DEFAULT 'Globar Manager',
+    id_user             INTEGER DEFAULT 1,
 
-    PRIMARY KEY (id_global_manager)
+    PRIMARY KEY (id_global_manager, id_user),
+
+    FOREIGN KEY (id_user)
+    REFERENCES users (id_user)
 );
 INSERT INTO globals_managers (name, lastname, phone, address, city, state, postal_code, country)
 VALUES ('Pepe', 'valencia', '3123453456', 'street starts #3456', 'Guadalajara','Jalisco', '28078', 'Mexico');
@@ -32,8 +50,13 @@ CREATE TABLE offices_managers (
     state               VARCHAR(35) NOT NULL,
     postal_code         VARCHAR(10) NOT NULL,
     country             VARCHAR(45) NOT NULL,
+    job                 VARCHAR(45) DEFAULT 'Office Manager',
+    id_user             INTEGER DEFAULT 1,
 
-    PRIMARY KEY (id_office_manager)
+    PRIMARY KEY (id_office_manager, id_user),
+
+    FOREIGN KEY (id_user)
+    REFERENCES users (id_user)
 );
 INSERT INTO offices_managers (name, lastname, phone, address, city, state, postal_code, country)
 VALUES ('Linda', 'Mendoza', '3122567809', 'street nose #3456', 'Colima','Colima', '28045', 'Mexico');
@@ -211,12 +234,17 @@ CREATE TABLE sellers (
     state               VARCHAR(35) NOT NULL,
     postal_code         VARCHAR(10) NOT NULL,
     country             VARCHAR(45) NOT NULL,
+    job                 VARCHAR(45) DEFAULT 'Seller',
     id_office_manager   INTEGER NOT NULL,
+    id_user             INTEGER DEFAULT 1,
 
-    PRIMARY KEY (id_seller, id_office_manager),
+    PRIMARY KEY (id_seller, id_office_manager, id_user),
 
     FOREIGN KEY (id_office_manager)
-    REFERENCES offices_managers (id_office_manager)
+    REFERENCES offices_managers (id_office_manager),
+
+    FOREIGN KEY (id_user)
+    REFERENCES users (id_user)
 );
 -- Seller is from Colima
 INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, country, id_office_manager)
@@ -338,19 +366,6 @@ VALUES (150000, 266900, 2, 3);
 INSERT INTO payments (deposit_amount, rest_amount, id_order, id_payment_status)
 VALUES (329900, 196300, 2, 3);
 
--- USERS AND SESSIONS -> They are just for development-------------------------------------------------
-
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-	id_user		INTEGER AUTO_INCREMENT NOT NULL,
-    username 	VARCHAR(15)  UNIQUE NOT NULL,
-    email		VARCHAR(100) UNIQUE NOT NULL,
-    password	VARCHAR(60)  NOT NULL,
-
-    PRIMARY KEY (id_user)
-);
-
-INSERT INTO users (username, email, password) VALUES ('root', 'root@root.com', 'root');
 
 -- SELECT * FROM users;
 -- SELECT * FROM sessions;

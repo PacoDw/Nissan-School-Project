@@ -1,6 +1,11 @@
 DROP PROCEDURE IF EXISTS newUser;
 DELIMITER //
-CREATE PROCEDURE newUser (_user VARCHAR(15), _email VARCHAR(100), _pass VARCHAR(60))
+CREATE PROCEDURE newUser (
+	_user      VARCHAR(15),
+	_email     VARCHAR(100), 
+	_pass	   VARCHAR(60), 
+	_typeUser  VARCHAR(60)
+	)
 
 DETERMINISTIC
 BEGIN
@@ -16,7 +21,7 @@ BEGIN
 		SELECT 'Error: You have empty inputs';
 	ELSE
 		 INSERT INTO users (username, email, password) VALUES (_user, _email, _pass);
-         SELECT u.id_user, u.username, u.email FROM users AS u WHERE u.username = _user;
+         SELECT u.id_user, u.username, u.email, u.typeUser FROM users AS u WHERE u.username = _user;
 	END IF;
 END
 // DELIMITER ;
