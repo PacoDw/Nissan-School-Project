@@ -3,6 +3,7 @@ const createError  = require('http-errors');
 const cookieParser = require('cookie-parser');
 const logger       = require('morgan');
 const bodyParser   = require('body-parser');
+// const cons         = require('consolidate');
 const flash        = require('connect-flash');
 
 // Set the enviroment variables-----------------------------------------------------
@@ -11,25 +12,31 @@ require('dotenv').config();
 const app = express();
 
 // Authentication packages----------------------------------------------------------
-const bcrypt        = require('bcrypt');
-const session       = require('express-session');
-const passport      = require('passport');
-const MySQLStore    = require('express-mysql-session')(session);
-const LocalStrategy = require('passport-local').Strategy;
+const bcrypt         = require('bcrypt');
+const session        = require('express-session');
+const passport       = require('passport');
+const MySQLStore     = require('express-mysql-session')(session);
+const LocalStrategy  = require('passport-local').Strategy;
 
 
 // Routes imports-------------------------------------------------------------------
-const index        = require('./routes/index');
-const register     = require('./routes/register');
-const login        = require('./routes/login');
-const logout       = require('./routes/logout'); 
-const teamRouter   = require('./routes/team');
-const seller       = require('./routes/seller');
+const home           = require('./routes/home');
+const user           = require('./routes/user');
+const login          = require('./routes/login');
+const logout         = require('./routes/logout'); 
+const teamRouter     = require('./routes/team');
+const seller         = require('./routes/seller');
+const officeManager  = require('./routes/officeManager');
+const globalManager  = require('./routes/globalManager');
+
+
 
 // view engine setup----------------------------------------------------------------
 app
     .set('views', `${__dirname}/views`)
-    .set('view engine', 'hbs');
+    .set('view engine', 'jsx')
+    .engine('jsx', require('express-react-views').createEngine( {beautify : true } ));
+
 
 
 //----------------------------------------------------------------------------------
@@ -56,20 +63,22 @@ app.use( (req, res, next) => { res.locals.isAuthenticated = req.isAuthenticated(
 //----------------------------------------------------------------------------------
 // Handling Routes------------------------------------------------------------------
 app
-    .use('/',         index)
-    .use('/register', register)
-    .use('/login',    login)
-    .use('/logout',   logout)
-    .use('/team',     teamRouter)
-    .use('/seller',   seller);
-
+    .use('/',              home)
+    .use('/user',          user)
+    .use('/login',         login)
+    .use('/logout',        logout)
+    .use('/team',          teamRouter)
+    .use('/seller',        seller)
+    .use('/officeManager', officeManager)
+    .use('/globalManager', globalManager)
 
 
 //----------------------------------------------------------------------------------
 // Passport local strategy
 passport.use(new LocalStrategy(
     (username, password, done) => {
-        
+        console.log('Login POST');
+
         // Conection to the database
         const db = require('./db/my_database');
 
@@ -94,9 +103,10 @@ passport.use(new LocalStrategy(
                         if ( response )
                         {    
                             const user = {
-                                id    : results[0].id_user,
-                                name  : results[0].username,
-                                email : results[0].email  
+                                id       : results[0].id_user,
+                                name     : results[0].username,
+                                email    : results[0].email,
+                                typeUser : results[0].typeUser
                             }
                 
                             return done(null, user);
@@ -131,31 +141,31 @@ app
     
   // render the error page-----------------------------------------------------------
       res.status(err.status || 500);
-      res.render('error');
+      res.render('Error');
     });
 
 
 
 // Handlebars default config---------------------------------------------------------
-const hbs = require('hbs');
-const fs = require('fs');
+// const hbs = require('hbs');
+// const fs = require('fs');
 
-const partialsDir = __dirname + '/views/partials';
+// const partialsDir = __dirname + '/views/partials';
 
-const filenames = fs.readdirSync(partialsDir);
+// const filenames = fs.readdirSync(partialsDir);
 
-filenames.forEach(function (filename) {
-  const matches = /^([^.]+).hbs$/.exec(filename);
-  if (!matches) {
-    return;
-  }
-  const name = matches[1];
-  const template = fs.readFileSync(partialsDir + '/' + filename, 'utf8');
-  hbs.registerPartial(name, template);
-});
+// filenames.forEach(function (filename) {
+//   const matches = /^([^.]+).hbs$/.exec(filename);
+//   if (!matches) {
+//     return;
+//   }
+//   const name = matches[1];
+//   const template = fs.readFileSync(partialsDir + '/' + filename, 'utf8');
+//   hbs.registerPartial(name, template);
+// });
 
-hbs.registerHelper('json', function(context) {
-    return JSON.stringify(context, null, 2);
-});
+// hbs.registerHelper('json', function(context) {
+//     return JSON.stringify(context, null, 2);
+// });
 
 module.exports = app;
