@@ -6,8 +6,8 @@ a {
   color: #00B7FF;
 }
 :root {
-  --input-padding-x: .75rem;
-  --input-padding-y: .75rem;
+  --input-padding-x: .50rem;
+  --input-padding-y: .50rem;
 }
 
 .form-signin {
@@ -67,8 +67,8 @@ a {
 }
 
 .form-label-group input:not(:placeholder-shown) ~ label {
-  padding-top: calc(var(--input-padding-y) / 3);
-  padding-bottom: calc(var(--input-padding-y) / 3);
-  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 13px;
   color: #777;
 }
