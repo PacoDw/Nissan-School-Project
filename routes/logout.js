@@ -5,13 +5,14 @@ const router   = express.Router();
 
 // Seller Route---------------------------------------------------------------------
 router
-	.get('/', auth.allLogins(), (req, res) => {
+    // add auth.allLogins()
+	.get('/', (req, res) => {
 		console.log("Logout--------------------------");
 
         req.logout();
         req.session.destroy();
 
-        res.render('index', {auth : req.isAuthenticated()});
+        res.render('Home', {auth : req.isAuthenticated()});
     })
     
 module.exports = router;
