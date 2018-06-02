@@ -6,12 +6,17 @@ const router   = express.Router();
 // Login routes
 router
         .get('/', (req, res) => {
-            res.render('login', { message: req.flash('error') } );
+            console.log('---------------------------------------')    
+            console.log('Login Get');
+            
+            res.render('LoginApp', { 
+                messageFlash: req.flash('error') 
+            });
         })
         
         .post('/',  passport.authenticate('local', 
             { 
-                successRedirect: '/seller',
+                successRedirect: '/Seller',
                 failureRedirect: '/login',
                 failureFlash: true 
             })
