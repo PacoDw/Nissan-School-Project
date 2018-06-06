@@ -21,7 +21,7 @@ const LocalStrategy  = require('passport-local').Strategy;
 
 // Routes imports-------------------------------------------------------------------
 const home           = require('./routes/home');
-const user           = require('./routes/user');
+const account        = require('./routes/account');
 const login          = require('./routes/login');
 const logout         = require('./routes/logout'); 
 const teamRouter     = require('./routes/team');
@@ -56,7 +56,7 @@ app
 
 
 
-// Midleware that setting true if the user is athenticated before that passing to routes
+// Midleware that setting true if the Account is athenticated before that passing to routes
 app.use( (req, res, next) => { res.locals.isAuthenticated = req.isAuthenticated(); next(); } );
 
 
@@ -64,7 +64,7 @@ app.use( (req, res, next) => { res.locals.isAuthenticated = req.isAuthenticated(
 // Handling Routes------------------------------------------------------------------
 app
     .use('/',              home)
-    .use('/user',          user)
+    .use('/account',       account)
     .use('/login',         login)
     .use('/logout',        logout)
     .use('/team',          teamRouter)
@@ -82,14 +82,13 @@ passport.use(new LocalStrategy(
         // Conection to the database
         const db = require('./db/my_database');
 
-        db.users.query('SELECT id_user, username, email, password FROM users WHERE username = ?', 
+        db.users.query('SELECT id_account, username, email, password FROM accounts WHERE username = ?', 
         [username], (err, results, fields) => {
             if ( err ) {
                 console.log('Ocurrio un error');
                 return done(err);                
             }
-
-            if( results.length === 0 )
+            else if( results.length === 0 )
             {
                 // console.log('No existe el usuario en la base de datos');
                 return done(null, false, { message: 'Incorrect username or password.' });
@@ -102,18 +101,18 @@ passport.use(new LocalStrategy(
                             
                         if ( response )
                         {    
-                            const user = {
-                                id       : results[0].id_user,
+                            const account = {
+                                id       : results[0].id_account,
                                 name     : results[0].username,
                                 email    : results[0].email,
-                                typeUser : results[0].typeUser
+                                typeAccount : results[0].typeAccount
                             }
                 
-                            return done(null, user);
+                            return done(null, account);
                         }
                         else
                         {
-                            // console.log('The password or user is incorrect');
+                            // console.log('The password or account is incorrect');
                             return done(null, false, { message: 'Incorrect username or password.'} );
                             return done(null, false);
                         }
