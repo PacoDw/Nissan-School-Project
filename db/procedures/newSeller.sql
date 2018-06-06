@@ -17,19 +17,20 @@ BEGIN
 	DECLARE aux_name VARCHAR(50);
     DECLARE aux_lastname VARCHAR(50);
     
-    SET aux_name     = (SELECT s.name FROM sellers as s WHERE s.name = _name);
-    SET aux_lastname = (SELECT s.lastname FROM sellers as s WHERE s.lastname = _lastname);
+    SET aux_name     = (SELECT s.name FROM sellers as s WHERE s.name = _name ORDER BY s.id_seller LIMIT 1);
+    SET aux_lastname = (SELECT s.lastname FROM sellers as s WHERE s.lastname = _lastname ORDER BY s.id_seller LIMIT 1);
     
     IF (aux_name = _name AND aux_lastname = _lastname) THEN
 		SELECT 'Error: This seller is already exists within the database' as error;
-	ELSEIF (_name = '' OR _lastname = '') THEN
+	ELSE IF (_name = '' OR _lastname = '') THEN
 		SELECT 'Error: You have empty inputs' as error;
-	ELSE
-        INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, country, id_office_manager, id_user)
-        VALUES (_name, _lastname, _phone, _address, _city, _state, _postal_code, _country, _id_office_manager, 1);  
+	ELSE 
+        INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, country, id_office_manager)
+        VALUES (_name, _lastname, _phone, _address, _city, _state, _postal_code, _country, _id_office_manager);  
 
         SELECT 'Success: The seller have been save' as success;
 	END IF;
+    END IF;
 END
 // DELIMITER ;
 
@@ -41,9 +42,16 @@ INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, c
 VALUES ('Alberto', 'Rubio', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2);
 
 SELECT * FROM sellers;
+CALL newSeller('Francisco David', 'Preciado Mendoza', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2);
+
+INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, country, id_office_manager, id_account)
+VALUES ('Francisco David', 'Preciado Mendoza', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2, 2);
+
 
 CALL newSeller('Anastacia', 'Paulino', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2);
 
 SET FOREIGN_KEY_CHECKS=0;
 TRUNCATE TABLE sellers;
 SET FOREIGN_KEY_CHECKS=1;
+
+use nissan_db;
