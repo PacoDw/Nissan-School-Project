@@ -1,23 +1,38 @@
 import React from 'react';
 
-const InputText = props => {
-    console.log('---------------------------------------')    
-    console.log('Input Text')
-    console.log('---------------------------------------')  
-    return (
-        <div className='form-label-group'>
-            <input 
-                className   = 'form-control' 
-                type        = { props.type || 'text' } 
-                id          = { props.name } 
-                name        = { props.name }
-                placeholder = { props.text } 
-                required  
-                value='4'
-            />
-            <label htmlFor={props.name}>{props.text}</label>
-        </div>
-    );
+class InputText extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+          value      : '',
+          type       : props.type,
+          name       : props.name,
+          text       : props.text  
+        };
+    
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(event) {
+        this.setState({value: event.target.value});
+      }
+    
+      render() {
+        return (
+            <div className='form-label-group'>
+                <input 
+                    className   = 'form-control' 
+                    type        = { this.state.type || 'text' } 
+                    id          = { this.state.name } 
+                    name        = { this.state.name }
+                    placeholder = { this.state.text } 
+                    value       = { this.state.value }
+                    onChange    = { this.handleChange }
+                />
+                <label htmlFor={this.state.name}>{this.state.text}</label>
+            </div>
+        );
+    }
 };
 
 module.exports = InputText;

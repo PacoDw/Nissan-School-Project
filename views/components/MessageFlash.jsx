@@ -8,26 +8,18 @@ class MessageFlash extends Component {
         super(props);
 
         this.state = {
-            messageFlash : props.messageFlash
+            messageFlash : props.messageFlash,
+            clase        : props.clase
         }
-        console.log('-----------------------------------------------')        
-        console.log('Message Flash Component')
-        console.log('props: ', this.state.messageFlash)
-        console.log('state: ', this.props.messageFlash)   
-        console.log(props);     
-        console.log('-----------------------------------------------')
     }
 
     componentWillEnter(callback) {
         const element = this.container;
-        console.log(element)
         TweenMax.fromTo(element, 0.3, {y: -100, opacity: 0}, {y: 0, opacity: 1, onComplete: callback});
     }
 
     componentWillLeave (callback) {
         const element = this.container;
-        console.log(element)
-
         TweenMax.fromTo(element, 0.3, {y: 0, opacity: 1}, {y: -100, opacity: 0, onComplete: callback});
     }
 
@@ -41,9 +33,10 @@ class MessageFlash extends Component {
             <div 
                 ref={ this.setContainer.bind(this) } 
                 id='messageFlash' 
-                className="alert alert-danger messageFlash" 
+
+                className = { this.state.clase }  
                 role="alert"
-                style = {{margin: '5px 0 0 0'}}
+                style = {{margin: '5px 0 15px 0'}}
             > 
                 { this.state.messageFlash }
             </div>

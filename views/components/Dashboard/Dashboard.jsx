@@ -6,47 +6,48 @@ import Icon  from '../Icon.jsx';
 
 
 const Dashboard = ( props ) => {
-    console.log('-------------------------');
-    console.log('Dashboard form')
-    // console.log(props.onGetSellers)
-    console.log('-------------------------');
-    // console.log(props.messageFlash)
-
     return (
                 <nav className="col-md-2 d-none d-md-block  sidebar bg-white rounded box-shadow">
                     <div className="sidebar-sticky" style={{ position: 'relative'}}>
                         <ul className="nav flex-column">
                                  
                         <Icon
-                            first = 'text'
                             icon  = 'eye'
                             text  = 'Sellers'
-                            someClick  = ''
+                            someClick = { props.onGetSellersData }
+
+                            dataToggle = 'tooltip'
+                            position   = 'bottom'
+                            tipTitle   = 'Whatch sellers'
                         />    
                       
                         <Icon
                             first = 'icon'
                             icon  = 'plus-square'
                             text  = 'New Seller'
-                            modal = 'modal' 
+
+                            dataToggle = 'modal' 
                             dataTarget = '#addSeller'
-                            someClick  = ''
                         /> 
 
                         <Icon
-                            first = 'text'
                             icon  = 'eye'
-                            text  = 'Users'
-                            someClick  = ''
+                            text  = 'Accounts'
+                            someClick = { props.onGetAccountsData }
+
+                            dataToggle = 'tooltip'
+                            position   = 'bottom'
+                            tipTitle   = 'Whatch accounts'
                         />    
 
                         <Icon
                             first = 'icon'
                             icon  = 'plus-square'
-                            text  = 'New User'
-                            modal = 'modal' 
-                            dataTarget = '#addUser'
-                            someClick  = ''
+                            text  = 'New Account'
+                            someClick  = { props.onUpdateAccountData }
+
+                            dataToggle = 'modal' 
+                            dataTarget = '#addAccount'
                         /> 
 
                         </ul>

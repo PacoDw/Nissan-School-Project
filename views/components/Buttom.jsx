@@ -1,13 +1,13 @@
 import React from 'react';
 
 const Buttom = props => {
-    console.log('---------------------------------------')    
-    console.log('Buttom')
-    console.log(props)
-    console.log('---------------------------------------')  
+    let color = {
+        backgroundColor: props.color
+    };
     return (
         <button 
-            className='btn btn-lg btn-primary btn-block' 
+            className ='btn btn-primary' 
+            style= { color }
             id      = { props.name } 
             name    = { props.name } 
             onClick = { props.someClick  }
