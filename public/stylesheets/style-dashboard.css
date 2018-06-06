@@ -191,10 +191,22 @@ a:hover {
 }
 
 .icon-right {
-  position: absolute;
+  position: fixed;
   right: 24px;
 }
 
 .nav-left {
   margin-left: 12px;
+}
+
+.customTable {
+  background-color: white;
+}
+
+.modal-dialog{
+  width: 45%;
+}
+.icon-table{
+  display: inline-block;
+  padding: 0 10px;
 }
