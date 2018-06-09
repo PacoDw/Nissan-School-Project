@@ -20,8 +20,8 @@ router
                 if(err) throw err;
 
                  // Inserting a new Account withing the database
-                db.users.query("CALL newAccount(?, ?, ?, ?)", 
-                    [ req.body.username, req.body.email, hash, req.body.typeAccount ], 
+                db.users.query("CALL newAccount(?, ?, ?, ?, ?)", 
+                    [ req.body.username, req.body.email, hash, req.body.selected.typeAccount, req.body.selected.id ], 
                 (err, results, fields) => {
                     if (err)  {
                         console.log('Error MysSQL: ', err);
@@ -35,34 +35,59 @@ router
             });
         })
 
+        	.delete('/deleteAccount/:id/:typeAccount',  (req, res) => {
+
+                console.log('Params: ', req.params);
+                console.log('ID:     ', req.params.id);
+                console.log('Type:   ', req.params.typeAccount);
+                
+                // Conection to the database
+                const db = require('../db/my_database');
+
+                    /*DETENERMINAR QUE TIPO DE USUARIO ES Y SACAR SU ID YA SEA SELLER Y
+                    REGRESARLO AL FROND PARA PONERLO EN EL OPTIONS */
+                    db.users.query('CALL itemRemovedAccount(?, ?)', [req.params.id, req.params.typeAccount], 
+                    (err, resultado, fields) => {
+                        console.log('REST : ', resultado)
+                        if (err)  {
+                            console.log('Error MysSQL: ', err);
+                        }
+                        else
+                        {
+                            let itemRemoved = 'empty';
+                            itemRemoved = resultado[0][0];
+
+                            db.users.query("Call deleteAccount(?)", [req.params.id], 
+                            (err, results, fields) => {
+                                if (err)  {
+                                    console.log('Error MysSQL: ', err);
+                                    res.status(400).send({ messageFlash : 'Error Interno: Vuelva intentarlo mas tarde.' }); 
+                                }
+                                else if (results[0][0].error)
+                                    res.status(400).send({ messageFlash : results[0][0].error });
+                                else
+                                    res.status(200).send( { messageFlash : results[0][0].success, itemRemoved } );
+                            });
+                        }
+                    })
+            })
+
          // ------------------------------------------------------------------------------------
         // We need add the restrict middleware
         .get('/allAccounts', (req, res) => {
-            console.log('-----------------------------')
-            console.log('Route global manager Accounts')
+		const db = require('../db/my_database');
 
-            const db = require('../db/my_database');
+		db.users.query("SELECT a.id_account, a.email,  a.username, a.typeAccount FROM accounts as a", 
+			[], 
+			(err, results, fields) => {
+			
+			console.log('-----------------------------')
+			console.log(results);
+			console.log('-----------------------------')
 
-            db.users.query("SELECT u.id_account, u.name FROM accounts as u",
-                [],
-                (err, results, fields) => {
-
-                    // console.log('-----------------------------')
-                    // console.log(JSON.stringify(results, undefined, 2));
-                    // console.log('-----------------------------')
-                    let r = JSON.stringify(results, undefined, 2);
-                    // res.json(results);
-                    res.render('TempApp', {
-                        account      : 'Paco Preciado',//req.account,
-                        auth      : true, //req.isAuthenticated(),
-                        typeAccount  : 'officeManager',
-                        titlePage : 'Testing Nissan',
-                        messageFlash: req.flash('info'),
-                        options: r,
-                    });
-                }
-            );
-        })
+			res.json(results);
+		});
+	})
 
 
 passport.serializeUser(function(account, done) {
