@@ -6,32 +6,21 @@ const router   = express.Router();
 
 // Seller Route---------------------------------------------------------------------
 router
+	// ----------------------------------------------------------------------------------------
+	// My Dashboard 
 	.get('/', (req, res) => {
-		console.log("Seller--------------------------");
-		// console.log(req.user);
-		// console.log(req.isAuthenticated());
 
-		const db = require('../db/my_database');
+		console.log('-----------------------------')
+		console.log('Route Seller')
 
-		db.users.query("SELECT s.id_seller, s.name FROM sellers as s", 
-			[], 
-			(err, results, fields) => {
-			
-			console.log('-----------------------------')
-			// console.log(JSON.stringify(results, undefined, 2));
-			console.log('-----------------------------')
-			let r = JSON.stringify(results, undefined, 2);
-			// res.json(results)
-
-			res.render('Seller', {
-				titlePage     : 'Seller', 
-				username      : 'Nissan', // req.user.name ||,
-				auth          : req.isAuthenticated(),
-				messageFlash  : req.flash('info'),
-				options       : r
-			});
-
-		});
+        res.render('TempApp', {
+            user      : 'Paco Preciado',//req.user,
+            auth      : true, //req.isAuthenticated(),
+            typeUser  : 'Seller',
+            page      : 'seller',
+            titlePage : 'Testing Nissan',
+            messageFlash: req.flash('info'),
+        });
 	})
 
 	// ----------------------------------------------------------------------------------------
@@ -73,14 +62,15 @@ router
 	// Create New Seller - We need add the restrict middleware auth.justManagers(),
 	.delete('/deleteSeller/:id',  (req, res) => {
 
-		console.log('Paramas: ', req.params.id);
+		console.log('Params: ', JSON.parse(req.params.id));
 
 		// Conection to the database
 		const db = require('../db/my_database');
 
 			// Inserting a new user withing the database
-			db.users.query("Call deleteSeller(?)", [req.params.id], 
+			db.users.query("CALL deleteSeller(?)", [req.params.id], 
 			(err, results, fields) => {
+				console.log('RESUTS BACKEND: ', results);
 				if (err)  {
 					console.log('Error MysSQL: ', err);
 					res.status(400).send({ messageFlash : 'Error Interno: Vuelva intentarlo mas tarde.' }); 
@@ -99,7 +89,7 @@ router
 
 		const db = require('../db/my_database');
 
-		db.users.query("SELECT s.id_seller, s.name FROM sellers as s WHERE id_account = 1", 
+		db.users.query("SELECT s.id_seller, s.name, s.job FROM sellers as s WHERE id_account = 1", 
 			[], 
 
 			(err, results, fields) => {
@@ -125,7 +115,7 @@ router
 
 			res.json(results);
 		});
-		})
+	})
 
 
 
