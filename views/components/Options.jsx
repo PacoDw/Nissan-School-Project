@@ -9,7 +9,13 @@ const Option = props => {
     console.log('---------------------------------------')  
 
     return (
-        <option className='form-control' id={props.id} value={ props.val } >{ props.name }</option>
+        <option 
+            className='form-control' 
+            id={props.id} 
+            typeAccount={ props.typeAccount } 
+            value={ props.val } 
+        >{ props.name }
+        </option>
     );
 };
 

@@ -6,11 +6,15 @@ const Icon = props  => {
 
     return (
             <a 
-                className  = { props.clase || "nav-link" } 
-                id         = { props.id }
-                href       = { props.href  || '#' }
-                onClick    = { props.someClick } 
+                className   = { props.clase || "nav-link" } 
+                id          = { props.id }
+                href        = { props.href  || '#' }
+                onClick     = { props.someClick } 
+                typeAccount = { props.typeAccount }
+                role        = { props.role }
 
+                aria-controls = { props.ariaC }
+                data-toggle   = { props.dataToggle2 }
                 data-toggle    = { props.dataToggle } // modal
                 title          = { props.tipTitle }
                 data-placement = { props.position } 

@@ -68,7 +68,7 @@ class SellerTable extends Component {
                 this.state.onDeleteParent(JSON.stringify(results), id);
             }
         }
-        ajax.open('DELETE', `/seller/deleteSeller/${id}`, true); 
+        ajax.open('DELETE', `/seller/deleteSeller/${id}`); 
         ajax.send(); 
     }
 
@@ -143,7 +143,12 @@ class SellerTable extends Component {
             }
         
         return (
-            <table className="table table-hover customTable">
+            <table 
+                className = { this.props.clase }
+                role      = { this.props.role }
+                aria-labelledby = { this.props.ariaLab }
+                id        = { this.props.id}
+            >
                 <thead className="thead-dark">
                     <tr>
                         <th scope="col">#id</th>

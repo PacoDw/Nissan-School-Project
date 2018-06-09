@@ -23,7 +23,6 @@ class AccountAddForm extends React.Component {
 
      static getDerivedStateFromProps(nextProps, prevState) {
         if (nextProps.visible !== prevState.visible) {
-            
             return {
                 visible: nextProps.visible,
                 messageFlash: nextProps.messageFlash
@@ -95,7 +94,7 @@ class AccountAddForm extends React.Component {
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <Buttom
-                                type=''
+                                type='reset'
                                 name='buttom-save-account'
                                 text='Save Changes'
                                 someClick = { this.state.onPostData }
