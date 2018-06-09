@@ -39,16 +39,17 @@ INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, c
 VALUES ('Carlos', 'Gastron', '3128906534' , 'Centro calle nose #4343', 'Colima','Colima', '28023', 'Mexico', 1);
 
 INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, country, id_office_manager)
-VALUES ('Alberto', 'Rubio', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2);
+VALUES ('Alberto', 'Rubio', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 1);
 
 SELECT * FROM sellers;
 CALL newSeller('Francisco David', 'Preciado Mendoza', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2);
+CALL newSeller('NISSAN', 'NISSAN N', '3148635543', 'GUADALARA', 'JALISCO','JALISCO', '29326', 'Mexico', 1);
 
 INSERT INTO sellers (name, lastname, phone, address, city, state, postal_code, country, id_office_manager, id_account)
 VALUES ('Francisco David', 'Preciado Mendoza', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2, 2);
 
 
-CALL newSeller('Anastacia', 'Paulino', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 2);
+CALL newSeller('Anastacia', 'Paulino', '3148635543', 'Centro calle nose #3343', 'Manzanillo','Colima', '29326', 'Mexico', 1);
 
 SET FOREIGN_KEY_CHECKS=0;
 TRUNCATE TABLE sellers;
