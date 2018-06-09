@@ -2,12 +2,16 @@ const React = require('react');
 const { findDOMNode } = require('react-dom');
 const TransitionGroup = require('react-addons-transition-group');
 
-// Modules
+// Modules---------------------------------------------------------------------------------
 const Dashboard      = require('./components/Dashboard/Dashboard.jsx');
-const SellerAddForm  = require('./components/Seller/SellerAddForm.jsx');
-const AccountAddForm = require('./components/Account/AccountAddForm.jsx');
 const MessageFlash   = require('./components/MessageFlash.jsx');
+
+const SellerAddForm  = require('./components/Seller/SellerAddForm.jsx');
 const SellerTable    = require('./components/Seller/SellerTable.jsx');
+
+const AccountAddForm = require('./components/Account/AccountAddForm.jsx');
+const AccountTable   = require('./components/Account/AccountTable.jsx')
+
 
 class Test extends React.Component {
 
@@ -17,25 +21,35 @@ class Test extends React.Component {
         this.state = {
             messageFlash     : props.messageFlash || '',
             typeAccount      : props.typeAccount,
+            page             : props.page,
             optionsAccount   : '',
             allSellers       : '',
+            allAccounts      : '',
             visibleAccount   : false,
             visibleSeller    : false,
             visibleDash      : false
          }
 
+        // Sellers
         this.handleWatchSellers = this.handleWatchSellers.bind(this);
-        this.handleWatchAccounts   = this.handleWatchAccounts.bind(this);
         this.handleAddSeller  = this.handleAddSeller.bind(this);
-        this.handleAddAccount    = this.handleAddAccount.bind(this); 
         this.handleGetSellersWithoutAccount = this.handleGetSellersWithoutAccount.bind(this);
         this.handleGetAllSellers = this.handleGetAllSellers.bind(this);
-
         this.handleDeleteSeller = this.handleDeleteSeller.bind(this);
+       
+        // Accounts
+        this.handleWatchAccounts   = this.handleWatchAccounts.bind(this);
+        this.handleAddAccount    = this.handleAddAccount.bind(this); 
+        this.handleGetAllAccounts = this.handleGetAllAccounts.bind(this);
+        this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
     }
-
-    handleWatchSellers(e){
+    /**=================================================================================================== */
+    /**SELLER */
+    /**=================================================================================================== */
+    handleWatchSellers(e){                                       // HANDLE WATCH SELLERS
         e.preventDefault();
+        window.location.href = '/officeManager/sellers';
+
         if(this.state.allSellers === '')
         {
             this.handleGetAllSellers( (sellers) => {
@@ -45,91 +59,20 @@ class Test extends React.Component {
             });
         }
     }
-
+    handleGetAllSellers(callback){                                // HANDLE GET ALL SELLERS
+        let ajax = new XMLHttpRequest(); 
     
-    handleWatchAccounts(e){
-        e.preventDefault();
-        console.log('---------------------------------------')    
-        console.log('Handle all AccountS')
-        console.log('---------------------------------------')    
-    }
-
-
-    onGetForm(formulario, callback){
-        const dataForm = {};
-        let key   = '';
-        let value = '';
-
-        for (let i = 0; i < formulario.elements.length; i++)
-        {
-            if (formulario.elements[i].tagName == 'SELECT')
-            { 
-                key = 'selected';
-                value = { 
-                    'id'  : formulario.elements[i].selectedOptions[0].attributes['id'].nodeValue,
-                    'value' :formulario.elements[i].selectedOptions[0].attributes['value'].nodeValue 
-                };
+            ajax.onload = () => {
+                
+                if(ajax.status != 200)
+                    alert('Todo MAL GET ALL SELLERS')
+                else 
+                    return callback(ajax.responseText);
             }
-            else if(formulario.elements[i].tagName == 'INPUT')
-            {
-                key   = formulario.elements[i].attributes['name'].nodeValue;
-                value = formulario.elements[i].attributes['value'].nodeValue;
-            }
-            dataForm[key] = value;
-        }
-
-        return callback(dataForm);
+            ajax.open('GET', '/seller/allSellers', true); 
+            ajax.send(); 
     }
-
-    
-    handleAddAccount(e) {
-        e.preventDefault();
-
-        // let formulario = document.querySelector('#accountAddForm'); 
-
-        // this.onGetForm(formulario, ( dataForm ) => {
-        
-        //     let ajax = new XMLHttpRequest(); // Creo el objeto XMLHttpRequest y lo guardo en ajax
-    
-
-        //     ajax.onload = () => {
-        //         if(ajax.status != 200) {
-        //             // console.log('ALGO SALIO MAL');
-    
-        //             this.setState({
-        //                 visibleAccount : !this.state.visibleAccount,
-        //                 messageFlash : JSON.parse(ajax.responseText).messageFlash
-        //             });
-    
-        //             setTimeout(() => {
-        //                 this.setState({
-        //                     visibleAccount : !this.state.visibleAccount
-        //                 });
-        //             }, 4000)
-    
-        //         } else {    
-                    
-        //             document.querySelector('#closeAddForm').click();
-    
-        //             this.setState({
-        //                 visibleDash : !this.state.visibleDash,
-        //                 messageFlash : JSON.parse(ajax.responseText).messageFlash
-        //             });
-    
-        //             setTimeout(() => {
-        //                 this.setState({
-        //                     visibleDash : !this.state.visibleDash
-        //                 });
-        //             }, 4000)
-        //         }
-        //     }
-        //     ajax.open('POST', '/account/addAccount', true); // Preparando la peticion al servidor
-        //     ajax.setRequestHeader('Content-Type', 'application/Json');
-        //     ajax.send(JSON.stringify(dataForm)); // Enviando la peticion
-        // });
-    }
-
-    handleAddSeller(e) {
+    handleAddSeller(e) {                                            // HANDLE ADD SELLER
         e.preventDefault();
         
         let formulario = document.querySelector('#sellerAddForm'); 
@@ -180,37 +123,9 @@ class Test extends React.Component {
             ajax.send(JSON.stringify(dataForm)); 
          });
     }
-
-    handleGetSellersWithoutAccount(callback){
-        let ajax = new XMLHttpRequest(); 
-
-        ajax.onload = () => {
-            if(ajax.status != 200)
-                alert('Todo MAL SELLER WITHOUT ACCOUNT')
-            else 
-                return callback(ajax.responseText);
-        }
-        ajax.open('GET', '/seller/SellersWithoutAccount', true); 
-        ajax.send(); 
-    }
-
-    handleGetAllSellers(callback){
-        let ajax = new XMLHttpRequest(); 
-    
-            ajax.onload = () => {
-                
-                if(ajax.status != 200)
-                    alert('Todo MAL ')
-                else 
-                    return callback(ajax.responseText);
-            }
-            ajax.open('GET', '/seller/allSellers', true); 
-            ajax.send(); 
-    }
-
-    handleDeleteSeller(sellersUpdated, idRemoved)
+    handleDeleteSeller(sellersUpdated, idRemoved)                       // HANDLE DELETE SELLERS
     {
-        console.log('Algo', sellersUpdated);
+        // console.log('Algo', sellersUpdated);
         let options = JSON.parse(this.state.optionsAccount);
 
         if ( idRemoved != null ){
@@ -218,21 +133,184 @@ class Test extends React.Component {
             if(!options)
                 this.handleGetSellersWithoutAccount( (res) => options = JSON.parse(res) );
 
-            console.log('options: ', options);      
+            // console.log('options: ', options);      
             let resultsOptions = options.filter( (obj) =>  obj.id_seller != idRemoved );
 
             this.setState({
                 optionsAccount : JSON.stringify(resultsOptions)
             });
         }
+            this.setState({
+                allSellers : sellersUpdated
+            });
+    }
+    handleGetSellersWithoutAccount(callback){                           // HANDLE GET SELLERS WHITHOUT ACCOUNT
+        let ajax = new XMLHttpRequest(); 
 
-        this.setState({
-            allSellers : sellersUpdated
-        });
+        ajax.onload = () => {
+            if(ajax.status != 200)
+                alert('Todo MAL SELLER WITHOUT ACCOUNT')
+            else {
+                console.log(ajax.responseText);
+                return callback(ajax.responseText);
+            }
+        }
+        ajax.open('GET', '/seller/SellersWithoutAccount', true); 
+        ajax.send(); 
     }
 
-  render() {
-    return (
+
+    /**=================================================================================================== */
+    /**ACCOUNT */
+    /**=================================================================================================== */
+    handleWatchAccounts(e){                                           // HANDLE WATCH ACCOUNTS 
+        e.preventDefault(); 
+        window.location.href = '/officeManager/accounts';
+        if(this.state.allAccounts == '')
+        {
+            this.handleGetAllAccounts( (accounts) => {
+                this.setState({
+                    allAccounts : accounts 
+                });
+            });
+        }
+    }
+    handleGetAllAccounts(callback){                                    // HANDLE GET ALL ACCOUNTS
+        let ajax = new XMLHttpRequest(); 
+    
+            ajax.onload = () => {
+                
+                if(ajax.status != 200)
+                    alert('Todo MAL GET ALL ACCOUNTS')
+                else 
+                    return callback(ajax.responseText);
+            }
+            ajax.open('GET', '/account/allAccounts', true); 
+            ajax.send(); 
+    }
+    handleAddAccount(e) {
+        e.preventDefault();
+                                                       // HANDLE ADD ACCOUNT          
+        let formulario = document.querySelector('#accountAddForm'); 
+
+        this.onGetForm(formulario, ( dataForm ) => {
+            
+            let ajax = new XMLHttpRequest(); 
+
+            ajax.onload = () => {
+                if(ajax.status != 200) {
+    
+                    this.setState({
+                        visibleAccount : !this.state.visibleAccount,
+                        messageFlash : JSON.parse(ajax.responseText).messageFlash
+                    });
+    
+                    setTimeout(() => {
+                        this.setState({
+                            visibleAccount : !this.state.visibleAccount
+                        });
+                    }, 4000)
+                } else {
+                    this.handleGetSellersWithoutAccount( (results) => {
+                        this.setState({
+                            optionsAccount : results
+                        });
+                    });
+                    
+                    document.querySelector('#closeAddForm').click();
+    
+                    setTimeout(() => {
+                        this.setState({
+                            visibleDash : !this.state.visibleDash
+                        });
+                    }, 4000);
+
+                    this.handleGetAllAccounts ( (accounts) => {
+                        //     console.log('ACccounts total: ', accounts);
+                            this.setState({
+                                allAccounts  : accounts,
+                                visibleDash  : !this.state.visibleDash,
+                                messageFlash : JSON.parse(ajax.responseText).messageFlash
+                            });
+                        });
+                }
+            }
+            ajax.open('POST', '/account/addAccount', true); 
+            ajax.setRequestHeader('Content-Type', 'application/Json');
+            ajax.send(JSON.stringify(dataForm)); 
+        });
+    }
+    handleDeleteAccount(itemRemoved)                       // HANDLE DELETE SELLERS
+    {
+        let listAccounts = '';
+            if (this.state.optionsAccount == '[]' || this.state.optionsAccount == '')
+                    this.setState( { optionsAccount : `[${JSON.stringify(itemRemoved)}]` } );
+            else
+            {
+                listAccounts = JSON.parse(this.state.optionsAccount);
+                listAccounts.push(itemRemoved);
+    
+                this.setState( { optionsAccount : JSON.stringify(listAccounts) } );  
+            }            
+        this.handleGetAllAccounts( res => this.setState( { allAccounts : res } ));
+    }
+
+    onGetForm(formulario, callback){
+        const dataForm = {};
+        let key   = '';
+        let value = '';
+
+        for (let i = 0; i < formulario.elements.length; i++)
+        {
+            if (formulario.elements[i].tagName == 'SELECT')
+            { 
+                key = 'selected';
+                value = { 
+                    'id'  : formulario.elements[i].selectedOptions[0].attributes['id'].nodeValue,
+                    'value' : formulario.elements[i].selectedOptions[0].attributes['value'].nodeValue, 
+                    'typeAccount' : formulario.elements[i].selectedOptions[0].attributes['typeAccount'].nodeValue
+                };
+            }
+            else if(formulario.elements[i].tagName == 'INPUT')
+            {
+                key   = formulario.elements[i].attributes['name'].nodeValue;
+                value = formulario.elements[i].attributes['value'].nodeValue;
+            }
+            dataForm[key] = value;
+        }
+
+        return callback(dataForm);
+    }
+
+    
+    /**=================================================================================================== */
+    /**RENDER */
+    /**=================================================================================================== */
+    render() {
+        let table = '';
+
+        if (this.state.page == 'sellers')
+            table = <SellerTable 
+                allSellers     = { this.state.allSellers }
+                onDeleteSeller = { this.handleDeleteSeller }
+                clase          = { 'table table-hover customTable'}
+                id             = { 'list-seller'}
+            />
+        else if (this.state.page == 'accounts')
+            table = <AccountTable 
+                allAccounts     = { this.state.allAccounts }
+                onDeleteAccount = { this.handleDeleteAccount }
+                clase          = { 'table table-hover customTable'}
+                id             = { 'list-account'}
+            />
+        else if (this.state.page == 'officeManager')
+            table = <OfficeManager 
+            
+            
+            />
+
+            
+        return (
             <div>
                 <Dashboard 
                     onGetAccountsData    = { this.handleWatchAccounts }
@@ -248,10 +326,7 @@ class Test extends React.Component {
                             /> : null}
                     </TransitionGroup> 
                     
-                    <SellerTable 
-                        allSellers = { this.state.allSellers }
-                        onDeleteSeller = { this.handleDeleteSeller }
-                    />
+                    { table }
             
                     <SellerAddForm
                         messageFlash = { this.state.messageFlash }
@@ -268,8 +343,8 @@ class Test extends React.Component {
 
                 </main>            
             </div>
-    );
-  }
+        );
+    }
 }
  
 module.exports = Test;
