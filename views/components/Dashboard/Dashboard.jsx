@@ -1,5 +1,7 @@
 import React from  'react';
 const feather = require('feather-icons');
+const { Link } = require('react-router-dom');
+
 
 // Modules-----------------------------
 import Icon  from '../Icon.jsx';
@@ -13,7 +15,9 @@ const Dashboard = ( props ) => {
                                  
                         <Icon
                             icon  = 'eye'
+                            clase = 'nav-link icon-route'
                             text  = 'Sellers'
+                            clase = 'nav-link icon-route'
                             someClick = { props.onGetSellersData }
 
                             dataToggle = 'tooltip'
@@ -22,7 +26,8 @@ const Dashboard = ( props ) => {
                         />    
                       
                         <Icon
-                            first = 'icon'
+                            clase = 'nav-link icon-route'
+
                             icon  = 'plus-square'
                             text  = 'New Seller'
 
@@ -33,17 +38,20 @@ const Dashboard = ( props ) => {
                         <Icon
                             icon  = 'eye'
                             text  = 'Accounts'
+                            clase = 'nav-link icon-route'
                             someClick = { props.onGetAccountsData }
 
                             dataToggle = 'tooltip'
                             position   = 'bottom'
                             tipTitle   = 'Whatch accounts'
                         />    
+                            
 
                         <Icon
-                            first = 'icon'
                             icon  = 'plus-square'
                             text  = 'New Account'
+                            clase = 'nav-link icon-route'
+
                             someClick  = { props.onUpdateAccountData }
 
                             dataToggle = 'modal' 
