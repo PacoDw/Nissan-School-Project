@@ -1,6 +1,7 @@
-const React = require('react');
-const { findDOMNode } = require('react-dom');
+const React           = require('react');
 const TransitionGroup = require('react-addons-transition-group');
+
+import Api from '../utils/Api';
 
 // Modules---------------------------------------------------------------------------------
 const Dashboard      = require('./components/Dashboard/Dashboard.jsx');
@@ -31,11 +32,11 @@ class OfficeManager extends React.Component {
          }
 
         // Sellers
+        this.handleDeleteSeller = this.handleDeleteSeller.bind(this);
         this.handleWatchSellers = this.handleWatchSellers.bind(this);
         this.handleAddSeller  = this.handleAddSeller.bind(this);
         this.handleGetSellersWithoutAccount = this.handleGetSellersWithoutAccount.bind(this);
         this.handleGetAllSellers = this.handleGetAllSellers.bind(this);
-        this.handleDeleteSeller = this.handleDeleteSeller.bind(this);
        
         // Accounts
         this.handleWatchAccounts   = this.handleWatchAccounts.bind(this);
@@ -43,120 +44,156 @@ class OfficeManager extends React.Component {
         this.handleGetAllAccounts = this.handleGetAllAccounts.bind(this);
         this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
     }
+
+    componentWillMount() {
+        this.handleGetAllSellers( sellers => this.setState( { allSellers : sellers } ) );
+
+        this.handleGetAllAccounts( accounts => this.setState( { allAccounts : accounts } ) );
+
+        this.handleGetSellersWithoutAccount( options => this.setState( { optionsAccount : options } ) );
+
+    }
+
+
+
+
     /**=================================================================================================== */
     /**SELLER */
     /**=================================================================================================== */
     handleWatchSellers(e){                                       // HANDLE WATCH SELLERS
         e.preventDefault();
-        window.location.href = '/officeManager/sellers';
-
-        if(this.state.allSellers === '')
-        {
             this.handleGetAllSellers( (sellers) => {
                 this.setState({
-                    allSellers : sellers 
+                    allSellers : sellers,
+                    page       : 'sellers'
                 });
             });
-        }
+            this.handleGetSellersWithoutAccount( res => {
+                this.setState({
+                    optionsAccount : res    
+                });
+            });
+
     }
-    handleGetAllSellers(callback){                                // HANDLE GET ALL SELLERS
-        let ajax = new XMLHttpRequest(); 
-    
-            ajax.onload = () => {
-                
-                if(ajax.status != 200)
-                    alert('Todo MAL GET ALL SELLERS')
+    handleGetAllSellers(callback){                                  // HANDLE GET ALL SELLERS
+        Api
+            .get('/seller/AllSellers')
+            
+            .then( response => {
+                console.log('Response: ',  response);
+                if (response.ok){
+                    console.log('Response JSON: ', response);
+                    return response.json() 
+                }
                 else 
-                    return callback(ajax.responseText);
-            }
-            ajax.open('GET', '/seller/allSellers', true); 
-            ajax.send(); 
+                    Promise.reject({error : 'Algo salio mal en Get all sellers'}) 
+            })
+
+            .then( data =>  { 
+                console.log('DATA :: ', data)
+                return callback(data);
+            })
+
+            .catch( error => console.log('ERROR GET ALL SELLER: ', error));
     }
     handleAddSeller(e) {                                            // HANDLE ADD SELLER
         e.preventDefault();
-        
+
         let formulario = document.querySelector('#sellerAddForm'); 
 
         this.onGetForm(formulario, ( dataForm ) => {
-            
-            let ajax = new XMLHttpRequest(); 
-    
-            ajax.onload = () => {
-                if(ajax.status != 200) {
-                    this.setState({
-                        visibleSeller : !this.state.visibleSeller,
-                        messageFlash  : JSON.parse(ajax.responseText).messageFlash
-                    });
-    
-                    setTimeout(() => {
-                        this.setState({
-                            visibleSeller : !this.state.visibleSeller,
-                        });
-                    }, 4000)
-    
-                } else {
+                
+            Api
+                .post('/seller/addSeller', dataForm)
+
+                .then( Api.parseJSON )
+                .then( response => {
+                    if (response.ok)
+                        return response.json;
+                    else
+                        return Promise.reject(response.json);
+                })
+
+                .then( data => {
+                    console.log('Data AddSeller: ', data);
                     document.querySelector('#closeSellerForm').click();
 
                     this.handleGetAllSellers( (sellers) => {
                         this.setState({
                             allSellers : sellers,
                             visibleDash : !this.state.visibleDash,
-                            messageFlash : JSON.parse(ajax.responseText).messageFlash,
+                            messageFlash : data.messageFlash,
                         });
                     });
     
-                    setTimeout(() => {
-                        this.setState({
-                            visibleDash : !this.state.visibleDash,
-                        });
-                    }, 4000);
+                    setTimeout( () => this.setState( { visibleDash : !this.state.visibleDash, } ), 4000);
 
-                    this.handleGetSellersWithoutAccount( (results) => {
+                    this.handleGetSellersWithoutAccount( results => this.setState( { optionsAccount : results } ));
+                })
+
+                .catch( response => {
+                    this.setState({
+                        visibleSeller : !this.state.visibleSeller,
+                        messageFlash  : response.messageFlash
+                    });
+    
+                    setTimeout( () => this.setState( { visibleSeller : !this.state.visibleSeller, } ), 4000);
+                })
+         });
+    }
+    handleDeleteSeller(e)                       // HANDLE DELETE SELLERS
+    {
+        e.preventDefault();
+        console.log(e);
+        
+        let id  = e.target.attributes['id'].nodeValue;
+
+        Api
+            .delete(`/seller/deleteSeller/${id}`)
+            
+            .then( response => {
+                if (response.ok)
+                {
+                    let results = this.state.allSellers.filter( (obj) =>  obj.id_seller != id );
+                
+                    console.log('Resulsts delete',results);
+
+                    this.setState({
+                        allSellers : results
+                    });
+            
+                        
+                    this.handleGetSellersWithoutAccount( res => {
                         this.setState({
-                            optionsAccount : results
+                            optionsAccount : res    
                         });
                     });
                 }
-            }
-            ajax.open('POST', '/seller/addSeller', true);
-            ajax.setRequestHeader('Content-Type', 'application/Json');
-            ajax.send(JSON.stringify(dataForm)); 
-         });
-    }
-    handleDeleteSeller(sellersUpdated, idRemoved)                       // HANDLE DELETE SELLERS
-    {
-        // console.log('Algo', sellersUpdated);
-        let options = JSON.parse(this.state.optionsAccount);
+                else 
+                    Promise.reject({error : 'Algo salio mal en Delete sellers'}) 
+            })
 
-        if ( idRemoved != null ){
+            .catch( error => alert('ERROR Delete SELLER: ', error));
+    }
+    handleGetSellersWithoutAccount(callback){    
+        Api
+            .get('/seller/sellersWithoutAccount')
             
-            if(!options)
-                this.handleGetSellersWithoutAccount( (res) => options = JSON.parse(res) );
+            .then( response => {
+                console.log('Response  without account: ',  response);
+                if (response.ok){
+                    console.log('Response JSON without account: ', response);
+                    return response.json() 
+                }
+                else 
+                    Promise.reject({error : 'Algo salio mal en Get all without sellers'}) 
+            })
 
-            // console.log('options: ', options);      
-            let resultsOptions = options.filter( (obj) =>  obj.id_seller != idRemoved );
-
-            this.setState({
-                optionsAccount : JSON.stringify(resultsOptions)
-            });
-        }
-            this.setState({
-                allSellers : sellersUpdated
-            });
-    }
-    handleGetSellersWithoutAccount(callback){                           // HANDLE GET SELLERS WHITHOUT ACCOUNT
-        let ajax = new XMLHttpRequest(); 
-
-        ajax.onload = () => {
-            if(ajax.status != 200)
-                alert('Todo MAL SELLER WITHOUT ACCOUNT')
-            else {
-                console.log(ajax.responseText);
-                return callback(ajax.responseText);
-            }
-        }
-        ajax.open('GET', '/seller/SellersWithoutAccount', true); 
-        ajax.send(); 
+            .then( data =>  { 
+                console.log('DATA :: ', data)
+                return callback(data);
+            })
+            .catch( error => console.log('ERROR GET ALL WITHOUT SELLER: ', error));
     }
 
 
@@ -165,94 +202,118 @@ class OfficeManager extends React.Component {
     /**=================================================================================================== */
     handleWatchAccounts(e){                                           // HANDLE WATCH ACCOUNTS 
         e.preventDefault(); 
-        window.location.href = '/officeManager/accounts';
-        if(this.state.allAccounts == '')
-        {
-            this.handleGetAllAccounts( (accounts) => {
-                this.setState({
-                    allAccounts : accounts 
-                });
+
+        this.handleGetAllAccounts( (accounts) => {
+            this.setState({
+                allAccounts : accounts,
+                page        : 'accounts'
             });
-        }
+        });
+        this.handleGetSellersWithoutAccount( res => {
+            this.setState({
+                optionsAccount : res    
+            });
+        });
+
     }
-    handleGetAllAccounts(callback){                                    // HANDLE GET ALL ACCOUNTS
-        let ajax = new XMLHttpRequest(); 
-    
-            ajax.onload = () => {
-                
-                if(ajax.status != 200)
-                    alert('Todo MAL GET ALL ACCOUNTS')
-                else 
-                    return callback(ajax.responseText);
+    handleGetAllAccounts(callback){                                     // HANDLE GET ALL ACCOUNTS
+        Api
+        .get('/account/allAccounts')
+        
+        .then( response => {
+            console.log('Response Accounts: ',  response);
+            if (response.ok){
+                console.log('Response JSON: ', response);
+                return response.json() 
             }
-            ajax.open('GET', '/account/allAccounts', true); 
-            ajax.send(); 
+            else 
+                Promise.reject({error : 'Algo salio mal en Get all accounts'}) 
+        })
+
+        .then( data =>  { 
+            console.log('DATA :: ', data)
+            return callback(data);
+        })
+
+        .catch( error => console.log('ERROR GET ALL Accounts: ', error));
     }
+
     handleAddAccount(e) {
         e.preventDefault();
-                                                       // HANDLE ADD ACCOUNT          
+                                                                                      // HANDLE ADD ACCOUNT          
         let formulario = document.querySelector('#accountAddForm'); 
 
         this.onGetForm(formulario, ( dataForm ) => {
-            
-            let ajax = new XMLHttpRequest(); 
+            Api
+            .post('/account/addAccount', dataForm)
 
-            ajax.onload = () => {
-                if(ajax.status != 200) {
-    
+            .then( Api.parseJSON )
+            .then( response => {
+                console.log(response);
+                if (response.ok)
+                    return response.json;
+                else
+                    return Promise.reject(response.json);
+            })
+
+            .then( data => {
+                document.querySelector('#closeAddForm').click();
+
+                this.handleGetAllAccounts( accounts => {
                     this.setState({
-                        visibleAccount : !this.state.visibleAccount,
-                        messageFlash : JSON.parse(ajax.responseText).messageFlash
+                        allAccounts : accounts,
+                        visibleDash : !this.state.visibleDash,
+                        messageFlash : data.messageFlash,
                     });
-    
-                    setTimeout(() => {
-                        this.setState({
-                            visibleAccount : !this.state.visibleAccount
-                        });
-                    }, 4000)
-                } else {
-                    this.handleGetSellersWithoutAccount( (results) => {
-                        this.setState({
-                            optionsAccount : results
-                        });
-                    });
-                    
-                    document.querySelector('#closeAddForm').click();
-    
-                    setTimeout(() => {
-                        this.setState({
-                            visibleDash : !this.state.visibleDash
-                        });
-                    }, 4000);
+                });
 
-                    this.handleGetAllAccounts ( (accounts) => {
-                        //     console.log('ACccounts total: ', accounts);
-                            this.setState({
-                                allAccounts  : accounts,
-                                visibleDash  : !this.state.visibleDash,
-                                messageFlash : JSON.parse(ajax.responseText).messageFlash
-                            });
-                        });
-                }
-            }
-            ajax.open('POST', '/account/addAccount', true); 
-            ajax.setRequestHeader('Content-Type', 'application/Json');
-            ajax.send(JSON.stringify(dataForm)); 
+                setTimeout( () => this.setState( { visibleDash : !this.state.visibleDash, } ), 4000);
+
+                this.handleGetSellersWithoutAccount( results => this.setState( { optionsAccount : results } ));
+                console.log('Data AddAccounts: ', data);
+
+            })
+
+            .catch( response => {
+                console.log('Error add account: ', response);
+                this.setState({
+                    visibleAccount : !this.state.visibleAccount,
+                    messageFlash  : response.messageFlash
+                });
+
+                setTimeout( () => this.setState( { visibleAccount : !this.state.visibleAccount, } ), 4000);
+            });
         });
     }
-    handleDeleteAccount(itemRemoved)                       // HANDLE DELETE SELLERS
+    handleDeleteAccount(e)                       // HANDLE DELETE SELLERS
     {
-        let listAccounts = '';
-            if (this.state.optionsAccount == '[]' || this.state.optionsAccount == '')
-                    this.setState( { optionsAccount : `[${JSON.stringify(itemRemoved)}]` } );
-            else
-            {
-                listAccounts = JSON.parse(this.state.optionsAccount);
-                listAccounts.push(itemRemoved);
-    
-                this.setState( { optionsAccount : JSON.stringify(listAccounts) } );  
-            }            
-        this.handleGetAllAccounts( res => this.setState( { allAccounts : res } ));
+        console.log(e);
+        
+        let id  = e.target.attributes['id'].nodeValue;
+        let typeAccount = e.target.attributes['typeAccount'].nodeValue;
+
+        console.log('typeAccount: ', typeAccount);
+
+        Api
+            .delete(`/account/deleteAccount/${id}/${typeAccount}`)
+            
+            .then( response => {
+                if (response.ok)
+                {
+                    
+                    this.handleGetAllAccounts( accounts => this.setState( { allAccounts : accounts } ) );
+                    
+                    this.handleGetSellersWithoutAccount( res => {
+                        this.setState({
+                            optionsAccount : res    
+                        });
+                    });
+                }
+                else 
+                    Promise.reject({error : 'Algo salio mal en Delete account'}) 
+            })
+
+            .catch( error => alert('ERROR Delete Account: ', error));
     }
 
     onGetForm(formulario, callback){
