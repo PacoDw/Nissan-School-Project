@@ -1,5 +1,5 @@
 const express = require('express');
-const auth	   = require('../authAccounts/authAccount'); 
+const auth	   = require('../utils/authAccount'); 
 
 const router  = express.Router();
 
@@ -7,40 +7,40 @@ const router  = express.Router();
 router
 
     .get('/', (req, res) => {
-        res.redirect('/sellers');
-    })
-
-    // ------------------------------------------------------------------------------------
-    // We need add the restrict middleware
-    .get('/sellers', (req, res) => {
         console.log('-----------------------------')
         console.log('Route office manager')
 
         res.render('OfficeManagerApp', {
             user      : 'Paco Preciado',//req.user,
             auth      : true, //req.isAuthenticated(),
-            typeUser  : 'officeManager',
+            typeAccount  : 'officeManager',
             page      : 'sellers',
             titlePage : 'Testing Nissan',
             messageFlash: req.flash('info'),
         });
     })
 
-    // ------------------------------------------------------------------------------------
-    // We need add the restrict middleware
-    .get('/accounts', (req, res) => {
-        console.log('-----------------------------')
-        console.log('Route office manager')
+    // // ------------------------------------------------------------------------------------
+    // // We need add the restrict middleware
+    // .get('/sellers', (req, res) => {
 
-        res.render('OfficeManagerApp', {
-            user      : 'Paco Preciado',//req.user,
-            auth      : true, //req.isAuthenticated(),
-            typeUser  : 'officeManager',
-            page      : 'accounts',
-            titlePage : 'Testing Nissan',
-            messageFlash: req.flash('info'),
-        });
-    })
+    // })
+
+    // // ------------------------------------------------------------------------------------
+    // // We need add the restrict middleware
+    // .get('/accounts', (req, res) => {
+    //     console.log('-----------------------------')
+    //     console.log('Route office manager')
+
+    //     res.render('OfficeManagerApp', {
+    //         user      : 'Paco Preciado',//req.user,
+    //         auth      : true, //req.isAuthenticated(),
+    //         typeAccount  : 'officeManager',
+    //         page      : 'accounts',
+    //         titlePage : 'Testing Nissan',
+    //         messageFlash: req.flash('info'),
+    //     });
+    // })
 
      // ------------------------------------------------------------------------------------
     // We need add the restrict middleware
