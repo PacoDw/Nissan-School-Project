@@ -6,7 +6,7 @@ import Head    from './components/Head.jsx';
 import Header  from './components/Header/Header.jsx';
 import Scripts from './components/Scripts.jsx';
 
-import Test    from './Test.jsx'
+import Test    from './Test.jsx';
 
 class TempApp extends React.Component {
 
