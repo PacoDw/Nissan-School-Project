@@ -25,6 +25,8 @@ const account        = require('./routes/account');
 const login          = require('./routes/login');
 const logout         = require('./routes/logout'); 
 const teamRouter     = require('./routes/team');
+const car            = require('./routes/car');
+const sales          = require('./routes/sales');
 const seller         = require('./routes/seller');
 const officeManager  = require('./routes/officeManager');
 const globalManager  = require('./routes/globalManager');
@@ -68,6 +70,8 @@ app
     .use('/login',         login)
     .use('/logout',        logout)
     .use('/team',          teamRouter)
+    .use('/sales',         sales)
+    .use('/car',           car)
     .use('/seller',        seller)
     .use('/officeManager', officeManager)
     .use('/globalManager', globalManager)
