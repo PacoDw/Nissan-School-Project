@@ -2,13 +2,9 @@
 import React, { Component } from 'react';
 
 const Scripts = props => { 
-    console.log('---------------------------------------')    
-    console.log('Scripts')
-    console.log('---------------------------------------')    
 return (
     <div>
         <script src="../../assets/feather-icons/dist/feather.js" />   
-        <script src="../../assets/build.js" />   
         <script src="../../assets/main.js" />
         <script dangerouslySetInnerHTML={{__html: 'main(' + JSON.stringify(props.data) + ",'" + props.view + "')" }} />
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" />

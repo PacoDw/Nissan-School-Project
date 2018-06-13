@@ -8,11 +8,8 @@ class AccountTable extends Component {
 
         this.state = {
             allAccounts    : props.allAccounts,
-            onDeleteParent : props.onDeleteAccount
+            onDeleteAccount : props.onDeleteAccount
          }
-
-         this.handleclickDelete = this.handleclickDelete.bind(this);
-         this.handleClickEdit   = this.handleClickEdit.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -25,55 +22,55 @@ class AccountTable extends Component {
         return false;
     }
 
-    componentDidMount() {
-        let ajax = new XMLHttpRequest(); // Creo el objeto XMLHttpRequest y lo guardo en ajax
+    // componentDidMount() {
+    //     let ajax = new XMLHttpRequest(); // Creo el objeto XMLHttpRequest y lo guardo en ajax
 
-        ajax.onload = () => {
-            if(ajax.status != 200) {
-                alert('Todo MAL ')
-            } else {                
-                this.setState({
-                    allAccounts : ajax.responseText
-                })
-                // this.state.onDeleteParent(ajax.responseText, undefined);
-            }
-        }
-        ajax.open('GET', '/account/allAccounts', true); 
-        ajax.send(); 
-    }
+    //     ajax.onload = () => {
+    //         if(ajax.status != 200) {
+    //             alert('Todo MAL ')
+    //         } else {                
+    //             this.setState({
+    //                 allAccounts : ajax.responseText
+    //             })
+    //             // this.state.onDeleteParent(ajax.responseText, undefined);
+    //         }
+    //     }
+    //     ajax.open('GET', '/account/allAccounts', true); 
+    //     ajax.send(); 
+    // }
 
-    handleclickDelete(e){
-        e.preventDefault();
+    // handleclickDelete(e){
+    //     e.preventDefault();
     
-        console.log(e.target);
+    //     console.log(e.target);
         
-        let id  = e.target.attributes['id'].nodeValue;
-        let typeAccount = e.target.attributes['typeAccount'].nodeValue;
+    //     let id  = e.target.attributes['id'].nodeValue;
+    //     let typeAccount = e.target.attributes['typeAccount'].nodeValue;
         
-        let ajax = new XMLHttpRequest();
+    //     let ajax = new XMLHttpRequest();
         
-        ajax.onload = () => {
-            if(ajax.status != 200)
-            {
-                alert('ALGO SALIO MAL Account TABLE');
-            } 
-            else 
-            {
-                let tr = JSON.parse(this.state.allAccounts);
-                let results     = tr.filter( (obj) =>  obj.id_account != id );                
+    //     ajax.onload = () => {
+    //         if(ajax.status != 200)
+    //         {
+    //             alert('ALGO SALIO MAL Account TABLE');
+    //         } 
+    //         else 
+    //         {
+    //             let tr = JSON.parse(this.state.allAccounts);
+    //             let results     = tr.filter( (obj) =>  obj.id_account != id );                
                 
-                this.setState({
-                    allAccounts : JSON.stringify(results)
-                });
-                this.state.onDeleteParent(JSON.parse(ajax.responseText).itemRemoved);
-            }
-        }
-        ajax.open('DELETE', `/account/deleteAccount/${id}/${typeAccount}`, true); 
-        ajax.send(); 
-    }
+    //             this.setState({
+    //                 allAccounts : JSON.stringify(results)
+    //             });
+    //             this.state.onDeleteParent(JSON.parse(ajax.responseText).itemRemoved);
+    //         }
+    //     }
+    //     ajax.open('DELETE', `/account/deleteAccount/${id}/${typeAccount}`, true); 
+    //     ajax.send(); 
+    // }
 
-    handleClickEdit(e){
-        alert('Click Edit');
+    // handleClickEdit(e){
+    //     alert('Click Edit');
         // let ajax = new XMLHttpRequest(); // Creo el objeto XMLHttpRequest y lo guardo en ajax
     
         //     ajax.onload = () => {
@@ -89,13 +86,13 @@ class AccountTable extends Component {
         //     }
         //     ajax.open('UPDATE', '/account/', true); 
         //     ajax.send(); 
-    }
+    // }
     render() {
 
-        let itemlist = '';
-        if(this.state.allAccounts)
+        let itemlist = <tr><td colSpan='5' style={{textAlign : 'center'}}>Sin registros</td></tr>;
+        if(this.state.allAccounts != '' && this.state.allAccounts != [])
         {
-            let list = JSON.parse(this.state.allAccounts);
+            let list = this.state.allAccounts;
             itemlist = 	list.map((i, index) => {
                 let id = 0;
 
@@ -113,7 +110,7 @@ class AccountTable extends Component {
                                 icon  = 'edit-3'
                                 clase = 'icon-table'
                                 typeAccount = { i.typeAccount }
-                                someClick = { this.handleClickEdit }
+                                // someClick = { this.handleClickEdit }
 
                                 tipTitle   =  'Edit'
                                 dataToggle = 'tooltip'
@@ -127,7 +124,7 @@ class AccountTable extends Component {
                                 icon  = 'trash-2'
                                 clase = 'icon-table'
                                 typeAccount = { i.typeAccount }
-                                someClick = { this.handleclickDelete }
+                                someClick = { this.state.onDeleteAccount }
 
                                 tipTitle   =  'Delete'
                                 dataToggle = 'tooltip'

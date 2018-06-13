@@ -4,14 +4,19 @@ const Opt = require ('./Options.jsx');
 
 const Select = props => {
 	let itemlist = '';
+
+
+	console.log('Select Options: ', props.options)
+
 	if(props.options)
 	{
-		let opt = JSON.parse(props.options);
+		let opt = props.options;
+		console.log('Select Opt: ', opt)
 	
 		itemlist = 	opt.map(function(o) {
 			return <Opt 
-				key  = {  o.id || o.id_office_manager || o.id_global_manager || o.id_seller || o.id_account}
-				id   = {  o.id || o.id_office_manager || o.id_global_manager || o.id_seller || o.id_account}
+				key  = {  o.id || o.id_office_manager || o.id_global_manager || o.id_seller || o.id_account || o.id_sales}
+				id   = {  o.id || o.id_office_manager || o.id_global_manager || o.id_seller || o.id_account || o.id_sales}
 				val  = { o.name || o.username } 
 				name = { o.name || o.username }
 				typeAccount = { o.job  || o.typeAccount }
@@ -30,5 +35,7 @@ const Select = props => {
 		</div>
 	);
 }
+
+
 
 module.exports = Select;

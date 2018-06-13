@@ -37,19 +37,19 @@ class AccountAddForm extends React.Component {
             return null;
     }
 
-    componentDidMount() {
-        let ajax = new XMLHttpRequest();
+    // componentDidMount() {
+    //     let ajax = new XMLHttpRequest();
 
-        ajax.onload = () => {
-            if(ajax.status == 200) {
-                this.setState({
-                    options : ajax.responseText
-                })
-            }
-        }
-        ajax.open('GET', '/seller/SellersWithoutAccount', true); 
-        ajax.send(); 
-    }
+    //     ajax.onload = () => {
+    //         if(ajax.status == 200) {
+    //             this.setState({
+    //                 options : ajax.responseText
+    //             })
+    //         }
+    //     }
+    //     ajax.open('GET', '/seller/SellersWithoutAccount', true); 
+    //     ajax.send(); 
+    // }
 
     render() {
         return (

@@ -12,7 +12,7 @@ const Option = props => {
         <option 
             className='form-control' 
             id={props.id} 
-            typeAccount={ props.typeAccount } 
+            typeaccount={ props.typeAccount } 
             value={ props.val } 
         >{ props.name }
         </option>

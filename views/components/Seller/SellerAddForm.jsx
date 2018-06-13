@@ -15,8 +15,8 @@ class SellerAddForm extends React.Component {
 
         this.state = {
             visible: props.visible,
-            options: '',
             onPostData: props.onPostData,
+            options: props.options,
             messageFlash: ''
         }
     }
@@ -40,7 +40,7 @@ class SellerAddForm extends React.Component {
             if(ajax.status != 200) {
             } else {
                 this.setState({
-                    options : ajax.responseText
+                    options : JSON.parse(ajax.responseText)
                 })
             }
         }
