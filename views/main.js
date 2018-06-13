@@ -1,13 +1,13 @@
 // Dependencies
 const React     = require('react');
 const ReactDOM  = require('react-dom');
-
+require('babel-polyfill');
 // Module
 const Login         = require('./components/Login/Login.jsx');
 const OfficeManager = require('./OfficeManager.jsx');
 const Test          = require('./Test.jsx');
 const Err           = require('./Error.jsx');
-
+import registerServiceWorker from './registerServiceWorker';
 
 let main = function(data, view,  containerId) {
   const container = document.getElementById(containerId || 'content-body');
@@ -35,5 +35,6 @@ let main = function(data, view,  containerId) {
     break
   }
 };
+registerServiceWorker();
 
 module.exports = main;
