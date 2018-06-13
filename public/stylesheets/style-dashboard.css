@@ -219,7 +219,25 @@ a:hover {
   background-color: #c7c6c6;
 }
 
-.table{
+.table .sale-form {
   box-shadow: 0 0.1rem 1rem rgba(0,0,0,0.15);
   border-radius: 4px;
+}
+
+.sale-form{
+  background-color: white;
+}
+.nav-link.active {
+  border : none;
+}
+.nav-link:hover {
+  border: none;
+  /* border: 1px solid transparent; */
+}
+.nav-tabs .nav-link {
+  border: none;
+}
+.card {
+  display: inline-table;
+  margin: 3.9%;
 }
