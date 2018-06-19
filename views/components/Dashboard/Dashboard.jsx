@@ -28,7 +28,7 @@ const Dashboard = ( props ) => {
                         <Icon
                             clase = 'nav-link icon-route'
 
-                            icon  = 'plus-square'
+                            icon  = 'plus'
                             text  = 'New Seller'
 
                             dataToggle = 'modal' 
@@ -45,10 +45,9 @@ const Dashboard = ( props ) => {
                             position   = 'bottom'
                             tipTitle   = 'Whatch accounts'
                         />    
-                            
 
                         <Icon
-                            icon  = 'plus-square'
+                            icon  = 'plus'
                             text  = 'New Account'
                             clase = 'nav-link icon-route'
 
