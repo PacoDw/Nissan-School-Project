@@ -26,7 +26,9 @@ const login          = require('./routes/login');
 const logout         = require('./routes/logout'); 
 const teamRouter     = require('./routes/team');
 const car            = require('./routes/car');
+const customer       = require('./routes/customer');
 const sales          = require('./routes/sales');
+const order          = require('./routes/order');
 const seller         = require('./routes/seller');
 const officeManager  = require('./routes/officeManager');
 const globalManager  = require('./routes/globalManager');
@@ -70,8 +72,10 @@ app
     .use('/login',         login)
     .use('/logout',        logout)
     .use('/team',          teamRouter)
-    .use('/sales',         sales)
     .use('/car',           car)
+    .use('/customer',      customer)
+    .use('/sales',         sales)
+    .use('/order',         order)
     .use('/seller',        seller)
     .use('/officeManager', officeManager)
     .use('/globalManager', globalManager)
@@ -86,31 +90,32 @@ passport.use(new LocalStrategy(
         // Conection to the database
         const db = require('./db/my_database');
 
-        db.users.query('SELECT id_account, username, email, password FROM accounts WHERE username = ?', 
-        [username], (err, results, fields) => {
+        db.users.query('Call login(?)',  [ username ], (err, results) => {
+            console.log('RESULTS LOGIN: ', results[0][0]);
             if ( err ) {
-                console.log('Ocurrio un error');
                 return done(err);                
             }
-            else if( results.length === 0 )
+            else if( results[0][0].id_account == undefined )
             {
                 // console.log('No existe el usuario en la base de datos');
                 return done(null, false, { message: 'Incorrect username or password.' });
             }
             else
             {    
-                bcrypt.compare(password, results[0].password, 
+                bcrypt.compare(password, results[0][0].password, 
                     (err, response) => {
                         if (err) throw err;
-                            
+
                         if ( response )
                         {    
                             const account = {
-                                id       : results[0].id_account,
-                                name     : results[0].username,
-                                email    : results[0].email,
-                                typeAccount : results[0].typeAccount
+                                id_account  : results[0][0].id_account,
+                                username    : results[0][0].username,
+                                email       : results[0][0].email,
+                                typeAccount : results[0][0].typeAccount,
+                                id_user     : results[0][0].id_user
                             }
+                            console.log('Login in', account );
                 
                             return done(null, account);
                         }
@@ -146,29 +151,5 @@ app
       res.status(err.status || 500);
       res.render('Error');
     });
-
-
-
-// Handlebars default config---------------------------------------------------------
-// const hbs = require('hbs');
-// const fs = require('fs');
-
-// const partialsDir = __dirname + '/views/partials';
-
-// const filenames = fs.readdirSync(partialsDir);
-
-// filenames.forEach(function (filename) {
-//   const matches = /^([^.]+).hbs$/.exec(filename);
-//   if (!matches) {
-//     return;
-//   }
-//   const name = matches[1];
-//   const template = fs.readFileSync(partialsDir + '/' + filename, 'utf8');
-//   hbs.registerPartial(name, template);
-// });
-
-// hbs.registerHelper('json', function(context) {
-//     return JSON.stringify(context, null, 2);
-// });
 
 module.exports = app;
