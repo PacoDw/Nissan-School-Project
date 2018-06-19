@@ -19,6 +19,8 @@ Api.xhr = async function (route, data, verb) {
 	return fetch(url, options);
 };
 
+
+
 Api.get = function (route) {
 	return this.xhr(route, null, 'GET');
 }
