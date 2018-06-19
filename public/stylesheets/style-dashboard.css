@@ -241,3 +241,10 @@ a:hover {
   display: inline-table;
   margin: 3.9%;
 }
+.nav-link:focus{
+  background-color: #c7c6c6;
+}
+
+.icon-form{
+  font-size: 13px;
+}
