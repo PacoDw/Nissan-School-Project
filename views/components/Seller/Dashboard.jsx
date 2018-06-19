@@ -23,7 +23,7 @@ const Dashboard = ( props ) => {
                         />
                         
                         <Icon
-                            icon  = 'eye'
+                            icon  = 'plus'
                             clase = 'nav-link icon-route'
                             text  = 'Make a sale'
                             clase = 'nav-link icon-route'

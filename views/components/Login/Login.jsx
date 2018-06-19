@@ -11,7 +11,9 @@ class Login extends React.Component {
     constructor(props){
         super(props);
 
-        this.state = this.props;
+        this.state = {
+            messageFlash : props.messageFlash || ''
+        }
     }
 
     render() {

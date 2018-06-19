@@ -9,7 +9,7 @@ class SaleTable extends Component {
 
         this.state = {
             id_user      : props.id_user, 
-            allSales     : props.allSales || '',
+            allSales     : props.allSales || [],
             onDeleteSale : props.onDeleteSale
          } 
     }
@@ -37,7 +37,7 @@ class SaleTable extends Component {
                     this.setState( { allSales : response.json() } );
                 }
                 else 
-                    Promise.reject({error : 'Algo salio mal en table Get all sales'}) 
+                    Promise.reject( { error : 'Algo salio mal en table Get all sales' } ) 
             })
 
             .catch( error => console.log('ERROR GET Table ALL SALES: ', error));
@@ -47,7 +47,9 @@ class SaleTable extends Component {
 
         let itemlist = <tr><td colSpan='10' style={{textAlign : 'center'}}>Sin registros</td></tr>;
         console.log('LIST Sale: ', this.state.allSales);
-        if(this.state.allSales != '' && this.state.allSales != [])
+        console.log('equals: ', this.state.allSales == 0 );
+
+        if( this.state.allSales != undefined && this.state.allSales.length != 0 )
         {
             let list = this.state.allSales;
             itemlist = 	list.map((i, index) => {
