@@ -36,15 +36,15 @@ END
 -- TESTING ------------------------------------------------------------------------------
 -- SET FOREIGN_KEY_CHECKS=0;
 -- CALL deleteSeller(24);
-truncate table sellers;
-SET FOREIGN_KEY_CHECKS=1;
-select * from sellers;
--- select * from accounts;
-SELECT s.id_seller FROM sellers as s WHERE s.id_seller = 24 LIMIT 1;
+-- truncate table sellers;
+-- SET FOREIGN_KEY_CHECKS=1;
+-- select * from sellers;
+-- -- select * from accounts;
+-- SELECT s.id_seller FROM sellers as s WHERE s.id_seller = 24 LIMIT 1;
 
-SELECT s.id_account FROM sellers as s WHERE s.id_seller = 24;
+-- SELECT s.id_account FROM sellers as s WHERE s.id_seller = 24;
 
-SELECT s.id_account FROM sellers as s  WHERE s.id_account = 9;
+-- SELECT s.id_account FROM sellers as s  WHERE s.id_account = 9;
 
 -- DELETE FROM sellers WHERE sellers.id_seller = 2;
 -- use nissan_db;

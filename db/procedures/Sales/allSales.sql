@@ -16,10 +16,10 @@ END
 
 -- TESTING ------------------------------------------------------------------------------
 
-SELECT * FROM sales;
-CALL allSales();
+-- SELECT * FROM sales;
+-- CALL allSales();
 
-SET FOREIGN_KEY_CHECKS=0;
-SET FOREIGN_KEY_CHECKS=1;
+-- SET FOREIGN_KEY_CHECKS=0;
+-- SET FOREIGN_KEY_CHECKS=1;
 
-use nissan_db;
+-- use nissan_db;
