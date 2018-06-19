@@ -8,41 +8,26 @@ const router   = express.Router();
 router
 		// ----------------------------------------------------------------------------------------
 		// 
-		.get('/Sales', (req, res) => {
+		.get('/', auth.justSellers(), (req, res) => {
 
 			console.log('-----------------------------')
 			console.log('Route Seller')
-
-			res.render('TempApp', {
-				id_user   : 2,
-				user      : 'Paco Preciado', //req.user,
-				auth      : true,            //req.isAuthenticated(),
-				typeUser  : 'Seller',
-				page      : '',
-				titlePage : 'Testing Nissan',
-				messageFlash: req.flash('info'),
+			console.log(req.session.passport.user);
+			console.log(req.user);
+			
+			res.render('SellerApp', {
+				id_seller    : req.user.id_user, 
+				user         : req.user.username, 
+				auth         : true,            
+				typeAccount  : req.user.typeAccount,
+				titlePage    : `Nissan Bienvenido ${req.user.username}`  ,
+				messageFlash : req.flash('info'),
 			});
 		})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		// ----------------------------------------------------------------------------------------
 		// Create New Seller - We need add the restrict middleware auth.justManagers(),
-		.post('/addSeller',  (req, res) => {
+		.post('/addSeller', (req, res) => {
 
 			// Conection to the database
 			const db = require('../db/my_database');
@@ -50,8 +35,8 @@ router
 				// Inserting a new user withing the database
 				db.users.query("CALL newSeller(?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					[req.body.name, req.body.lastname, req.body.phone, req.body.address, req.body.city, 
-					req.body.state, req.body.postal_code, req.body.country, req.body.selected.id], 
-				(err, results, fields) => {
+					req.body.state, req.body.postal_code, req.body.country, req.body.selected.id_office_manager || req.body.selected.id ], 
+				(err, results) => {
 					if (err)  {
 						console.log('Error MysSQL: ', err);
 						res.status(500).send({ messageFlash : 'Error Interno: Vuelva intentarlo mas tarde.' }); 
@@ -66,17 +51,13 @@ router
 
 		// ----------------------------------------------------------------------------------------
 		// Create New Seller - We need add the restrict middleware auth.justManagers(),
-		.delete('/deleteSeller/:id',  (req, res) => {
-
-			console.log('Params: ', JSON.parse(req.params.id));
+		.delete('/deleteSeller/:id', (req, res) => {
 
 			// Conection to the database
 			const db = require('../db/my_database');
 
-				// Inserting a new user withing the database
 				db.users.query("CALL deleteSeller(?)", [req.params.id], 
 				(err, results, fields) => {
-					console.log('RESUTS BACKEND: ', results);
 					if (err)  {
 						console.log('Error MysSQL: ', err);
 						res.status(400).send({ messageFlash : 'Error Interno: Vuelva intentarlo mas tarde.' }); 
@@ -99,27 +80,45 @@ router
 				[], 
 
 				(err, results, fields) => {
-				
-				console.log('-----------------------------')
-				console.log(results);
-				console.log('-----------------------------')
 
 				res.json(results);
 			});
 		})
 
+		// Get a JSON DATA OF THE ALL SELLER WITHIN THE DATABASE
+		.get('/sellersWithoutAccountOf/:id', (req, res) => {
+
+			const db = require('../db/my_database');
+
+			db.users.query(`SELECT s.id_seller, s.name, s.job 
+			FROM sellers as s
+			INNER JOIN office_managers as om ON om.id_office_manager = s.id_office_manager
+			WHERE s.id_account = 1  AND s.id_office_manager = ?;`, [ req.params.id ], 
+
+				(err, results, fields) => {
+				
+				res.json(results);
+			});
+		})
+
 		.get('/allSellers', (req, res) => {
-			console.log('ENTRO A ALL SELLER')
 			const db = require('../db/my_database');
 
 			db.users.query("SELECT * FROM sellers as s", 
 				[], 
 				(err, results, fields) => {
-				
-				console.log('-----------------------------')
-				console.log(results);
-				console.log('-----------------------------')
 
+				res.json(results);
+			});
+		})
+
+		.get('/allSellersOf/:id', (req, res) => {
+			const db = require('../db/my_database');
+			
+			db.users.query(`SELECT * FROM sellers as s 
+							WHERE s.id_office_manager = ?`, [ req.params.id ], 
+				(err, results, fields) => {
+			
 				res.json(results);
 			});
 		})
