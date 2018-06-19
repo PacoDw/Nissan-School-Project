@@ -1,10 +1,11 @@
 const React           = require('react');
 const TransitionGroup = require('react-addons-transition-group');
 
-import Api from '../utils/Api';
+import Api        from '../utils';
+
 
 // Modules---------------------------------------------------------------------------------
-const Dashboard      = require('./components/Dashboard/Dashboard.jsx');
+const Dashboard      = require('./components/OfficeManager/Dashboard.jsx');
 const MessageFlash   = require('./components/MessageFlash.jsx');
 
 const SellerAddForm  = require('./components/Seller/SellerAddForm.jsx');
@@ -20,41 +21,46 @@ class OfficeManager extends React.Component {
         super(props);
 
         this.state = {
-            messageFlash     : props.messageFlash || '',
-            typeAccount      : props.typeAccount,
-            page             : props.page,
-            optionsAccount   : '',
-            allSellers       : '',
-            allAccounts      : '',
-            visibleAccount   : false,
-            visibleSeller    : false,
-            visibleDash      : false
+            id_office_manager : props.id_office_manager,
+            id_account        : props.id_account,
+            messageFlash      : props.messageFlash || '',
+            typeAccount       : props.typeAccount,
+            page              : props.page,
+            optionsAccount    : '',
+            allSellers        : '',
+            allAccounts       : '',
+            visibleAccount    : false,
+            visibleSeller     : false,
+            visibleDash       : false
          }
 
         // Sellers
-        this.handleDeleteSeller = this.handleDeleteSeller.bind(this);
         this.handleWatchSellers = this.handleWatchSellers.bind(this);
-        this.handleAddSeller  = this.handleAddSeller.bind(this);
-        this.handleGetSellersWithoutAccount = this.handleGetSellersWithoutAccount.bind(this);
-        this.handleGetAllSellers = this.handleGetAllSellers.bind(this);
+        this.handleAddSeller    = this.handleAddSeller.bind(this);
+        this.handleDeleteSeller = this.handleDeleteSeller.bind(this);
        
         // Accounts
-        this.handleWatchAccounts   = this.handleWatchAccounts.bind(this);
-        this.handleAddAccount    = this.handleAddAccount.bind(this); 
-        this.handleGetAllAccounts = this.handleGetAllAccounts.bind(this);
+        this.handleWatchAccounts = this.handleWatchAccounts.bind(this);
         this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
+        this.handleAddAccount    = this.handleAddAccount.bind(this); 
     }
 
     componentWillMount() {
-        this.handleGetAllSellers( sellers => this.setState( { allSellers : sellers } ) );
 
-        this.handleGetAllAccounts( accounts => this.setState( { allAccounts : accounts } ) );
+        let id_office_manager = this.state.id_office_manager;
 
-        this.handleGetSellersWithoutAccount( options => this.setState( { optionsAccount : options } ) );
+        Api.Seller
+                .getSellersOf( id_office_manager, sellers => this.setState( { allSellers : sellers } ) )
+                .catch( error => console.log('ERROR WATCHT SELLER: ', error));
 
+        Api.Seller
+                .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ) )
+                .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
+
+        Api.Account    
+                .getAccountsOf( id_office_manager, accounts => { this.setState( { allAccounts : accounts } ) } )
+                .catch( error => console.log('ERROR GET ALL Accounts: ', error));
     }
-
-
 
 
     /**=================================================================================================== */
@@ -62,73 +68,52 @@ class OfficeManager extends React.Component {
     /**=================================================================================================== */
     handleWatchSellers(e){                                       // HANDLE WATCH SELLERS
         e.preventDefault();
-            this.handleGetAllSellers( (sellers) => {
-                this.setState({
-                    allSellers : sellers,
-                    page       : 'sellers'
-                });
-            });
-            this.handleGetSellersWithoutAccount( res => {
-                this.setState({
-                    optionsAccount : res    
-                });
-            });
+
+        let id_office_manager = this.state.id_office_manager;
+            Api.Seller
+                    .getSellersOf( id_office_manager, sellers => this.setState( { allSellers : sellers, page : 'sellers' } ) )
+                    .catch( error => console.log('ERROR WATCHT SELLER: ', error));
+
+            Api.Seller
+                    .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ))
+                    .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
+
 
     }
-    handleGetAllSellers(callback){                                  // HANDLE GET ALL SELLERS
-        Api
-            .get('/seller/AllSellers')
-            
-            .then( response => {
-                console.log('Response: ',  response);
-                if (response.ok){
-                    console.log('Response JSON: ', response);
-                    return response.json() 
-                }
-                else 
-                    Promise.reject({error : 'Algo salio mal en Get all sellers'}) 
-            })
 
-            .then( data =>  { 
-                console.log('DATA :: ', data)
-                return callback(data);
-            })
-
-            .catch( error => console.log('ERROR GET ALL SELLER: ', error));
-    }
     handleAddSeller(e) {                                            // HANDLE ADD SELLER
         e.preventDefault();
 
         let formulario = document.querySelector('#sellerAddForm'); 
 
         this.onGetForm(formulario, ( dataForm ) => {
+        console.log('DataFORM AddSeller: ', dataForm);
                 
-            Api
-                .post('/seller/addSeller', dataForm)
+            Api.Seller
+                .addSeller( dataForm )
 
-                .then( Api.parseJSON )
-                .then( response => {
-                    if (response.ok)
-                        return response.json;
-                    else
-                        return Promise.reject(response.json);
-                })
-
-                .then( data => {
-                    console.log('Data AddSeller: ', data);
+                 .then( data => {
                     document.querySelector('#closeSellerForm').click();
 
-                    this.handleGetAllSellers( (sellers) => {
-                        this.setState({
-                            allSellers : sellers,
-                            visibleDash : !this.state.visibleDash,
-                            messageFlash : data.messageFlash,
-                        });
-                    });
-    
+                    let id_office_manager = this.state.id_office_manager;
+
+                    
+                    Api.Seller
+                        .getSellersOf( id_office_manager, sellers => {
+                            this.setState({
+                                allSellers : sellers,
+                                visibleDash : !this.state.visibleDash,
+                                messageFlash : data.messageFlash,
+                            });
+                        })
+                        .catch( error => console.log('ERROR GET ALL SELLER: ', error));
+
+
                     setTimeout( () => this.setState( { visibleDash : !this.state.visibleDash, } ), 4000);
 
-                    this.handleGetSellersWithoutAccount( results => this.setState( { optionsAccount : results } ));
+                    Api.Seller
+                        .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ))
+                        .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
                 })
 
                 .catch( response => {
@@ -141,33 +126,32 @@ class OfficeManager extends React.Component {
                 })
          });
     }
-    handleDeleteSeller(e)                       // HANDLE DELETE SELLERS
-    {
+    
+    handleDeleteSeller(e) {                      // HANDLE DELETE SELLERS
         e.preventDefault();
         console.log(e);
         
         let id  = e.target.attributes['id'].nodeValue;
 
-        Api
-            .delete(`/seller/deleteSeller/${id}`)
-            
+        Api.Seller
+            .deleteSeller( id )
+
             .then( response => {
                 if (response.ok)
                 {
                     let results = this.state.allSellers.filter( (obj) =>  obj.id_seller != id );
-                
+                    let id_office_manager = this.state.id_office_manager;
+               
                     console.log('Resulsts delete',results);
 
                     this.setState({
                         allSellers : results
                     });
             
-                        
-                    this.handleGetSellersWithoutAccount( res => {
-                        this.setState({
-                            optionsAccount : res    
-                        });
-                    });
+                    Api.Seller
+                        .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ))
+                        .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
+
                 }
                 else 
                     Promise.reject({error : 'Algo salio mal en Delete sellers'}) 
@@ -175,67 +159,31 @@ class OfficeManager extends React.Component {
 
             .catch( error => alert('ERROR Delete SELLER: ', error));
     }
-    handleGetSellersWithoutAccount(callback){    
-        Api
-            .get('/seller/sellersWithoutAccount')
-            
-            .then( response => {
-                console.log('Response  without account: ',  response);
-                if (response.ok){
-                    console.log('Response JSON without account: ', response);
-                    return response.json() 
-                }
-                else 
-                    Promise.reject({error : 'Algo salio mal en Get all without sellers'}) 
-            })
 
-            .then( data =>  { 
-                console.log('DATA :: ', data)
-                return callback(data);
-            })
-            .catch( error => console.log('ERROR GET ALL WITHOUT SELLER: ', error));
-    }
 
 
     /**=================================================================================================== */
     /**ACCOUNT */
     /**=================================================================================================== */
-    handleWatchAccounts(e){                                           // HANDLE WATCH ACCOUNTS 
+    handleWatchAccounts(e) {                                           // HANDLE WATCH ACCOUNTS 
         e.preventDefault(); 
 
-        this.handleGetAllAccounts( (accounts) => {
-            this.setState({
-                allAccounts : accounts,
-                page        : 'accounts'
-            });
-        });
-        this.handleGetSellersWithoutAccount( res => {
-            this.setState({
-                optionsAccount : res    
-            });
-        });
+        let id_office_manager = this.state.id_office_manager;
 
-    }
-    handleGetAllAccounts(callback){                                     // HANDLE GET ALL ACCOUNTS
-        Api
-        .get('/account/allAccounts')
-        
-        .then( response => {
-            console.log('Response Accounts: ',  response);
-            if (response.ok){
-                console.log('Response JSON: ', response);
-                return response.json() 
-            }
-            else 
-                Promise.reject({error : 'Algo salio mal en Get all accounts'}) 
-        })
+        Api.Account    
+            .getAccountsOf( id_office_manager, accounts => {
+                this.setState( { 
+                    allAccounts : accounts,
+                    page        : 'accounts'  
+                }) 
+            })
+            .catch( error => console.log('ERROR GET ALL Accounts: ', error));
 
-        .then( data =>  { 
-            console.log('DATA :: ', data)
-            return callback(data);
-        })
+        Api.Seller
+            .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ))
+            .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
 
-        .catch( error => console.log('ERROR GET ALL Accounts: ', error));
+
     }
 
     handleAddAccount(e) {
@@ -244,70 +192,73 @@ class OfficeManager extends React.Component {
         let formulario = document.querySelector('#accountAddForm'); 
 
         this.onGetForm(formulario, ( dataForm ) => {
-            Api
-            .post('/account/addAccount', dataForm)
+            
+            console.log('dataFORM addAccount: ', dataForm);
 
-            .then( Api.parseJSON )
-            .then( response => {
-                console.log(response);
-                if (response.ok)
-                    return response.json;
-                else
-                    return Promise.reject(response.json);
-            })
+            Api.Account
+                .addAccount( dataForm )
 
-            .then( data => {
-                document.querySelector('#closeAddForm').click();
+                .then( data => {
+                    document.querySelector('#closeAddForm').click();
 
-                this.handleGetAllAccounts( accounts => {
+                    let id_office_manager = this.state.id_office_manager;
+
+
+                    Api.Account                 
+                        .getAccountsOf( id_office_manager, accounts => {
+                            this.setState({
+                                allAccounts : accounts,
+                                visibleDash : !this.state.visibleDash,
+                                messageFlash : data.messageFlash,
+                            })
+                    })
+                    .catch( error => console.log('ERROR GET ALL Accounts: ', error));
+
+
+                    setTimeout( () => this.setState( { visibleDash : !this.state.visibleDash, } ), 4000);
+
+                    Api.Seller
+                        .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ))
+                        .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
+
+
+                })
+
+                .catch( response => {
+                    console.log('Error add account: ', response);
                     this.setState({
-                        allAccounts : accounts,
-                        visibleDash : !this.state.visibleDash,
-                        messageFlash : data.messageFlash,
+                        visibleAccount : !this.state.visibleAccount,
+                        messageFlash  : response.messageFlash
                     });
+
+                    setTimeout( () => this.setState( { visibleAccount : !this.state.visibleAccount, } ), 4000);
                 });
-
-                setTimeout( () => this.setState( { visibleDash : !this.state.visibleDash, } ), 4000);
-
-                this.handleGetSellersWithoutAccount( results => this.setState( { optionsAccount : results } ));
-                console.log('Data AddAccounts: ', data);
-
-            })
-
-            .catch( response => {
-                console.log('Error add account: ', response);
-                this.setState({
-                    visibleAccount : !this.state.visibleAccount,
-                    messageFlash  : response.messageFlash
-                });
-
-                setTimeout( () => this.setState( { visibleAccount : !this.state.visibleAccount, } ), 4000);
-            });
         });
     }
-    handleDeleteAccount(e)                       // HANDLE DELETE SELLERS
-    {
-        console.log(e);
-        
+
+    handleDeleteAccount(e) {                       // HANDLE DELETE SELLERS
+        e.preventDefault();
+
         let id  = e.target.attributes['id'].nodeValue;
         let typeAccount = e.target.attributes['typeAccount'].nodeValue;
 
-        console.log('typeAccount: ', typeAccount);
+        Api.Account
+            .deleteAccount( id, typeAccount )
 
-        Api
-            .delete(`/account/deleteAccount/${id}/${typeAccount}`)
-            
             .then( response => {
                 if (response.ok)
                 {
-                    
-                    this.handleGetAllAccounts( accounts => this.setState( { allAccounts : accounts } ) );
-                    
-                    this.handleGetSellersWithoutAccount( res => {
-                        this.setState({
-                            optionsAccount : res    
-                        });
-                    });
+                    let id_office_manager = this.state.id_office_manager;
+
+
+                    Api.Account
+                        .getAccountsOf( id_office_manager, accounts => this.setState( { allAccounts : accounts } ) )
+                        .catch( error => console.log('ERROR GET ALL Accounts: ', error));
+
+                    Api.Seller
+                        .getSellersWithoutAccountOf( id_office_manager, accounts => this.setState( { optionsAccount : accounts } ))
+                        .catch( error => console.log('ERROR GET ALL WHATCH WITHOUT SELLER: ', error));
+
                 }
                 else 
                     Promise.reject({error : 'Algo salio mal en Delete account'}) 
@@ -327,10 +278,13 @@ class OfficeManager extends React.Component {
             { 
                 key = 'selected';
                 value = { 
-                    'id'  : formulario.elements[i].selectedOptions[0].attributes['id'].nodeValue,
-                    'value' : formulario.elements[i].selectedOptions[0].attributes['value'].nodeValue, 
-                    'typeAccount' : formulario.elements[i].selectedOptions[0].attributes['typeAccount'].nodeValue
+                    'id'         : formulario.elements[i].selectedOptions[0].attributes['id'].nodeValue,
+                    'id_office_manager' : this.state.id_office_manager,
+                    'value'             : formulario.elements[i].selectedOptions[0].attributes['value'].nodeValue, 
+                    'typeAccount'       : 'Seller'
                 };
+
+
             }
             else if(formulario.elements[i].tagName == 'INPUT')
             {
@@ -339,7 +293,6 @@ class OfficeManager extends React.Component {
             }
             dataForm[key] = value;
         }
-
         return callback(dataForm);
     }
 
@@ -352,24 +305,18 @@ class OfficeManager extends React.Component {
 
         if (this.state.page == 'sellers')
             table = <SellerTable 
-                allSellers     = { this.state.allSellers }
-                onDeleteSeller = { this.handleDeleteSeller }
-                clase          = { 'table table-hover customTable'}
-                id             = { 'list-seller'}
+                allSellers        = { this.state.allSellers }
+                onDeleteSeller    = { this.handleDeleteSeller }
+                clase             = { 'table table-hover customTable'}
+                id                = { 'list-seller'}
             />
         else if (this.state.page == 'accounts')
             table = <AccountTable 
-                allAccounts     = { this.state.allAccounts }
-                onDeleteAccount = { this.handleDeleteAccount }
-                clase          = { 'table table-hover customTable'}
-                id             = { 'list-account'}
+                allAccounts       = { this.state.allAccounts }
+                onDeleteAccount   = { this.handleDeleteAccount }
+                clase             = { 'table table-hover customTable'}
+                id                = { 'list-account'}
             />
-        else if (this.state.page == 'officeManager')
-            table = <OfficeManager 
-            
-            
-            />
-
             
         return (
             <div>
@@ -393,6 +340,7 @@ class OfficeManager extends React.Component {
                         messageFlash = { this.state.messageFlash }
                         visible      = { this.state.visibleSeller }
                         onPostData   = { this.handleAddSeller }
+                        typeAccount  = { this.state.typeAccount || 'OfficeManager' }
                     />
 
                     <AccountAddForm
