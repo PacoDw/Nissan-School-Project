@@ -5,19 +5,6 @@ const router   = express.Router();
 
 // Seller Route---------------------------------------------------------------------
 router
-		.get('/', (req, res) => {
-				console.log('-----------------------------')
-				console.log('Route office manager')
-
-				res.render('OfficeManagerApp', {
-					user      : 'Paco Preciado',//req.user,
-					auth      : true, //req.isAuthenticated(),
-					typeAccount  : 'officeManager',
-					page      : 'sellers',
-					titlePage : 'Testing Nissan',
-					messageFlash: req.flash('info'),
-				});
-			})
 
 		 // Get a JSON DATA OF THE ALL SELLER WITHIN THE DATABASE
 		 .get('/allCarsFromSeller/:id', (req, res) => {

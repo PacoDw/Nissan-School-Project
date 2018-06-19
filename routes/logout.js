@@ -12,7 +12,7 @@ router
         req.logout();
         req.session.destroy();
 
-        res.render('Home', {auth : req.isAuthenticated()});
+        res.render('LoginApp');
     })
     
 module.exports = router;
